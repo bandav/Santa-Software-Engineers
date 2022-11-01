@@ -82,5 +82,5 @@ class Pricerange(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True) # primary keys are required by SQLAlchemy
     min = db.Column(db.Integer, nullable=False)
     max = db.Column(db.Integer, nullable=False)
-    gifts = db.relationship('Gift', backref='price', lazy=True)
-    games = db.relationship('Game', backref='price', lazy=True)
+    #gifts = db.relationship('Gift', backref='price', lazy=True)
+    #games = db.relationship('Game', backref='price', lazy=True)
