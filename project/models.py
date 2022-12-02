@@ -20,7 +20,7 @@ gift_choice = db.Table('gift_choice',
 ###game_id integer, //FK to games
 ###PRIMARY KEY (user_id, game_id)
 ###);
-players = db.Table('players',
+playing = db.Table('playing',
     db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
     db.Column('game_id', db.Integer, db.ForeignKey('game.id'), primary_key=True)
 )
@@ -33,7 +33,6 @@ players = db.Table('players',
 ###display_name varchar(250),
 ###encrypted_password varchar(250)
 ###);
-
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True) # primary keys are required by SQLAlchemy
     username = db.Column(db.String(250), unique=True)
@@ -66,12 +65,16 @@ class Gift(UserMixin, db.Model):
 ###);
 class Game(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True) # primary keys are required by SQLAlchemy
+    title=db.Column(db.String(250))
     admin = db.Column(db.String(250))
     num_active_players = db.Column(db.Integer)
     max_capacity = db.Column(db.Integer)
     price_range = db.Column(db.Integer, db.ForeignKey('price.id'), nullable=False)
     has_started = db.Column(db.Integer)
-    players = db.relationship('User', secondary=players, lazy='subquery', backref=db.backref('games', lazy=True))
+    players = db.relationship('User', secondary=playing, lazy='subquery', backref=db.backref('games', lazy=True))
+
+    def is_playing(self, user):
+        return self.players.filter(playing.c.user_id == user.id).count() > 0
 
 ###CREATE TABLE price_ranges (
 ###price_range_id integer PRIMARY KEY,

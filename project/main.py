@@ -13,3 +13,9 @@ def index():
 @login_required
 def profile():
     return render_template('profile.html', name=current_user.displayname)
+
+@main.route('/games')
+@login_required
+def games():
+    # FIXME: Provide the correct parameters to the game
+    return render_template('games.html', name=current_user.displayname)
