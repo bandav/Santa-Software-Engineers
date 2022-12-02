@@ -1,20 +1,33 @@
 from flask import Blueprint, redirect, render_template, request, url_for, flash
 from flask import session as cur_session
 from flask_login import login_required, current_user
-from .models import User, Game
+from .models import User, Game, playing
 from . import db
 from werkzeug.security import generate_password_hash
 
-games = Blueprint('posts', __name__)
+games = Blueprint('games', __name__)
 
 @games.route('/create_game', methods=['POST'])
-@login_required
 def create_game():
     if request.form.get('action') == "Create Post":
       return render_template('create_post.html')
 
-@games.route('/disp_created_games')
-def disp_created_games(id, game_num, type):
+# TODO: Update to include price range
+@games.route('/game_created', methods=['POST'])
+def game_creation_handler():
+    if request.form.get('action') == "Game Created": 
+        title = request.form.get('title')
+        max_capacity = request.form.get('max_capacity')
+
+        # TODO: Update price range functionality
+        new_game = Game(title=title, admin=current_user.id, num_active_platers=0, max_capacity=max_capacity, price_range=0, has_started=0) \
+        
+        db.session.add(new_game)
+        db.session.commit()
+        return redirect(url_for('main.profile'))
+
+@games.route('/disp_created_games/<id>/<game_num>')
+def disp_created_games(id, game_num):
     game_list = get_created_games(id)
     if (not game_list or len(game_list) == 0):
         flash("You haven't created any games!")
@@ -24,13 +37,32 @@ def disp_created_games(id, game_num, type):
     while (game_num >= list_len):
         game_num-=1
     game_html = game_to_html(game_list[game_num])
-    # FIXME: below html was officially userline
     return render_template('created_games.html', id=id, game_num=game_num, game_html=game_html, list_len=list_len)
 
 def get_created_games(user_id):
     created_games = Game.query.filter_by(admin=user_id)
     result = []
     for game in created_games:
+      result.append(game.id)
+    return result
+
+@games.route('/disp_joined_games/<id>/<game_num>')
+def disp_joined_games(id, game_num):
+    game_list = get_joined_games(id)
+    if (not game_list or len(game_list) == 0):
+        flash("You haven't joined any games!")
+        return redirect(url_for('main.profile'))
+    game_num = int(game_num)
+    list_len = len(game_list)
+    while (game_num >= list_len):
+        game_num-=1
+    game_html = game_to_html(game_list[game_num])
+    return render_template('joined_games.html', id=id, game_num=game_num, game_html=game_html, list_len=list_len)
+
+def get_joined_games(id): #FIXME: Not too sure about this query
+    joined_games = playing.query.filter(playing.user_id == id)
+    result = []
+    for game in joined_games:
       result.append(game.id)
     return result
 

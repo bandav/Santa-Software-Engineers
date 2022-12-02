@@ -11,20 +11,22 @@
 <h1 class="title">Manage Games</h1>
   <div class="box">
 
-    <form action="/my_games/{{ id }}/0">
-      <button class="button is-block is-info is-large is-fullwidth" value="My Games" name="action" button
-        style="margin:5px;">My Games</button>
+    <form action="/created_games/{{ id }}/0">
+      <button class="button is-block is-info is-large is-fullwidth" value="Games Created" name="action" button
+        style="margin:5px;">Games Created</button>
     </form>
 
-    <form method="POST" action="/create_post">
+    <form action="/joined_games/{{ id }}/0">
+      <button class="button is-block is-info is-large is-fullwidth" value="Games Joined" name="action" button
+        style="margin:5px;">Games Joined</button>
+    </form>
+
+    <form method="POST" action="/create_game">
       <button class="button is-block is-info is-large is-fullwidth" value="Create Game" name="action" button
         style="margin:5px;">Create Game</button>
     </form>
 
-    <form action="/join game/{{ id }}/0">
-      <button class="button is-block is-info is-large is-fullwidth" value="Join Game" name="action" button
-        style="margin:5px;">Join Game</button>
-    </form>
+    <!--TODO: Move all games to navbar-->
 
   </div>
 

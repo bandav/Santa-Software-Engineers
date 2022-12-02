@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="column is-half is-offset-one-quarter">
+    <h1 class="title">Create Game</h1>
+    <div class="box">
+
+        <form method="POST" action="/game_created" enctype="multipart/form-data">
+
+            <input class="input" name="title" type="text" placeholder="Title">
+            <input class="input" name="max_capacity" type="number" placeholder="1">
+            <!-- TODO: Implement Price Range input + functionality -->
+            
+            <button class="button is-block is-black is-large is-fullwidth" value="Game Created" name="action" button
+            style="margin: 5px;">Create</button>
+
+        </form>
+    </div>
+</div>
+
+{% endblock %}
