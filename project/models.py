@@ -51,7 +51,7 @@ class User(UserMixin, db.Model):
 class Gift(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True) # primary keys are required by SQLAlchemy
     gift_name = db.Column(db.String(250), unique=True)
-    price_range_id = db.Column(db.Integer, db.ForeignKey('price.id'), nullable=False)
+    price = db.Column(db.Integer)
     description = db.Column(db.String(250))
     purchase_link = db.Column(db.String(250))
 
@@ -60,7 +60,8 @@ class Gift(UserMixin, db.Model):
 ###admin varchar,
 ###num_active_players integer,
 ###max_capacity integer,
-###price_range integer, //FK to price_ranges
+###max_price integer,
+###min_price integer,
 ###has_started integer,
 ###);
 class Game(UserMixin, db.Model):
@@ -69,21 +70,10 @@ class Game(UserMixin, db.Model):
     admin = db.Column(db.String(250))
     num_active_players = db.Column(db.Integer)
     max_capacity = db.Column(db.Integer)
-    price_range = db.Column(db.Integer, db.ForeignKey('price.id'), nullable=False)
+    max_price = db.Column(db.Integer)
+    max_price = db.Column(db.Integer)
     has_started = db.Column(db.Integer)
     players = db.relationship('User', secondary=playing, lazy='subquery', backref=db.backref('games', lazy=True))
 
     def is_playing(self, user):
         return self.players.filter(playing.c.user_id == user.id).count() > 0
-
-###CREATE TABLE price_ranges (
-###price_range_id integer PRIMARY KEY,
-###min integer,
-###max integer
-###);
-class Pricerange(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True) # primary keys are required by SQLAlchemy
-    min = db.Column(db.Integer, nullable=False)
-    max = db.Column(db.Integer, nullable=False)
-    #gifts = db.relationship('Gift', backref='price', lazy=True)
-    #games = db.relationship('Game', backref='price', lazy=True)
