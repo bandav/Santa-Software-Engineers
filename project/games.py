@@ -21,17 +21,15 @@ def game_creation_handler():
         max_price = request.form.get('max_price')
         min_price = request.form.get('min_price')
 
-        new_game = Game(title=title, admin=current_user.username, num_active_players=0, max_capacity=max_capacity, max_price=max_price, min_price=min_price, has_started=0) \
+        new_game = Game(title=title, admin=current_user.username, num_active_players=0, max_capacity=max_capacity, max_price=max_price, min_price=min_price) \
         
         db.session.add(new_game)
         db.session.commit()
         return redirect(url_for('main.profile'))
 
 @games.route('/disp_created_games/<id>/<game_num>')
-def disp_created_games(id, game_num):
-    print("id is this: " + id)    
+def disp_created_games(id, game_num):  
     game_list = get_created_games(id)
-    print(game_list)
     if (len(game_list) == 0):
         return redirect(url_for('main.profile'))
     game_num = int(game_num)
@@ -103,12 +101,11 @@ def game_to_html(game_id):
                 <button>Dislike</button>\
               </form>"
 
-    if obj.has_started:
-      if obj.is_playing(current_user):
-        html_string_base += html_string_joined
-      else:
-        if (obj.num_active_players > obj.max_capacity) and (obj.has_started == 1):
-          html_string_base += html_string_unjoined    
+    if obj.is_playing(current_user):
+      html_string_base += html_string_joined
+    else:
+      if (obj.num_active_players > obj.max_capacity):
+        html_string_base += html_string_unjoined    
 
     # Finish off whatever button state the post had
     html_string_base += "</nav>"

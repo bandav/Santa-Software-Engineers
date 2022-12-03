@@ -62,7 +62,6 @@ class Gift(UserMixin, db.Model):
 ###max_capacity integer,
 ###max_price integer,
 ###min_price integer,
-###has_started integer,
 ###);
 class Game(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True) # primary keys are required by SQLAlchemy
@@ -72,7 +71,6 @@ class Game(UserMixin, db.Model):
     max_capacity = db.Column(db.Integer)
     max_price = db.Column(db.Integer)
     min_price = db.Column(db.Integer)
-    has_started = db.Column(db.Integer)
     players = db.relationship('User', secondary=playing, lazy='subquery', backref=db.backref('games', lazy=True))
 
     def is_playing(self, user):

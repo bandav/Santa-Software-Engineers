@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<div class="columns is-4 is-offset-4">
+<div class="columns is-2 is-offset-2">
   <div class="column">
     <h1 class="title">My Games: Game #{{ game_num }}</h1>
     <div class="box">
@@ -18,7 +18,7 @@
     {% endif %}
 
     {% if game_num > 0 %}
-      <button class="button is-block is-black is-large is-fullwidth" onclick="location.href='/disp_userline/{{ id }}/{{ game_num - 1 }}';" type="button"value="Previous Game" name="action" button
+      <button class="button is-block is-black is-large is-fullwidth" onclick="location.href='/disp_created_games/{{ id }}/{{ game_num - 1 }}';" type="button"value="Previous Game" name="action" button
         style="margin:5px;">Previous Game</button>
     {% endif %}
   </div>
