@@ -71,7 +71,7 @@ class Game(UserMixin, db.Model):
     num_active_players = db.Column(db.Integer)
     max_capacity = db.Column(db.Integer)
     max_price = db.Column(db.Integer)
-    max_price = db.Column(db.Integer)
+    min_price = db.Column(db.Integer)
     has_started = db.Column(db.Integer)
     players = db.relationship('User', secondary=playing, lazy='subquery', backref=db.backref('games', lazy=True))
 

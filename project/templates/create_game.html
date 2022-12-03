@@ -7,11 +7,14 @@
     <div class="box">
 
         <form method="POST" action="/game_created" enctype="multipart/form-data">
-
+            <h3>Enter a title for your game:</h1>
             <input class="input" name="title" type="text" placeholder="Title">
-            <input class="input" name="max_capacity" type="number" placeholder="1">
-            <!-- TODO: Implement Price Range input + functionality -->
-            
+            <h3>Enter a max capacity for your game:</h1>
+            <input class="input" name="max_capacity" type="number" min="1" placeholder="1">
+            <h3>Enter an upper limit for gifts in your game:</h1>
+            <input class="input" name="max_price" type="number" min="0" placeholder="Enter amount of $"> 
+            <h3>Enter a lower limit for gifts in your game:</h1>
+            <input class="input" name="min_price" type="number" min="0" placeholder="Enter amount of $">
             <button class="button is-block is-black is-large is-fullwidth" value="Game Created" name="action" button
             style="margin: 5px;">Create</button>
 

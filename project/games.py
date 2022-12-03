@@ -12,15 +12,16 @@ def create_game():
     if request.form.get('action') == "Create Game":
       return render_template('create_game.html')
 
-# TODO: Update to include price range
 @games.route('/game_created', methods=['POST'])
 def game_creation_handler():
     if request.form.get('action') == "Game Created": 
+        
         title = request.form.get('title')
         max_capacity = request.form.get('max_capacity')
+        max_price = request.form.get('max_price')
+        min_price = request.form.get('min_price')
 
-        # TODO: Update price range functionality
-        new_game = Game(title=title, admin=current_user.id, num_active_players=0, max_capacity=max_capacity, price_range=0, has_started=0) \
+        new_game = Game(title=title, admin=current_user.username, num_active_players=0, max_capacity=max_capacity, max_price=max_price, min_price=min_price, has_started=0) \
         
         db.session.add(new_game)
         db.session.commit()
@@ -28,9 +29,10 @@ def game_creation_handler():
 
 @games.route('/disp_created_games/<id>/<game_num>')
 def disp_created_games(id, game_num):
+    print("id is this: " + id)    
     game_list = get_created_games(id)
-    if (not game_list or len(game_list) == 0):
-        flash("You haven't created any games!")
+    print(game_list)
+    if (len(game_list) == 0):
         return redirect(url_for('main.profile'))
     game_num = int(game_num)
     list_len = len(game_list)
@@ -39,8 +41,13 @@ def disp_created_games(id, game_num):
     game_html = game_to_html(game_list[game_num])
     return render_template('created_games.html', id=id, game_num=game_num, game_html=game_html, list_len=list_len)
 
-def get_created_games(user_id):
-    created_games = Game.query.filter_by(admin=user_id)
+def get_created_games(id):
+    print("hit!!")
+    print("id is this: " + id)
+    user = User.query.filter_by(id=id).first()
+    print("user" + user.username)     
+    created_games = Game.query.filter_by(admin=user.username)
+    print(created_games)
     result = []
     for game in created_games:
       result.append(game.id)
@@ -79,9 +86,9 @@ def game_to_html(game_id):
             <div class=\"content\">\
               <p>\
                 <strong>" + str(obj.title) + "</strong>\
-                <br>" + "Created by: @" + str(admin.username) +  + "</p>\
+                <br>" + "Created by: @" + str(admin.username) + "</p>\
                 <br>" + str(obj.num_active_players) + "/" + str(obj.max_capacity) + "</p>\
-                <br>" + "Price Range: " + str(obj.price_range) + "</p>\
+                <br>" + "Gifts range from " + str(obj.min_price) + "to " + str(obj.max_price) + "</p>\
             </div>\
         </article>\
         </div>"
