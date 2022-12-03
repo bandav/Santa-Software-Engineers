@@ -34,6 +34,9 @@ def create_app():
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint)
 
+    from .games import games as games_blueprint
+    app.register_blueprint(games_blueprint)
+
     with app.app_context():
         db.create_all()
 

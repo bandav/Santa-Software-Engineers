@@ -9,8 +9,8 @@ games = Blueprint('games', __name__)
 
 @games.route('/create_game', methods=['POST'])
 def create_game():
-    if request.form.get('action') == "Create Post":
-      return render_template('create_post.html')
+    if request.form.get('action') == "Create Game":
+      return render_template('create_game.html')
 
 # TODO: Update to include price range
 @games.route('/game_created', methods=['POST'])
@@ -20,7 +20,7 @@ def game_creation_handler():
         max_capacity = request.form.get('max_capacity')
 
         # TODO: Update price range functionality
-        new_game = Game(title=title, admin=current_user.id, num_active_platers=0, max_capacity=max_capacity, price_range=0, has_started=0) \
+        new_game = Game(title=title, admin=current_user.id, num_active_players=0, max_capacity=max_capacity, price_range=0, has_started=0) \
         
         db.session.add(new_game)
         db.session.commit()
