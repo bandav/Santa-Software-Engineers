@@ -19,6 +19,8 @@ Link to project drive: https://drive.google.com/drive/folders/1BzgpXEAnBL_EVPqr-
 4. Step through each of files, and pip install the dependencies onto your venv.
 5. If you're on Mac, run:
 
+    cd project (if you're on the parent dir)
+
     export FLASK_APP="\_\_init\_\_.py"
     
     export FLASK_ENV="development"
