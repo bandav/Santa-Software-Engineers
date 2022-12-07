@@ -1,7 +1,7 @@
 from flask import Blueprint, redirect, render_template, request, url_for, flash
 from flask import session as cur_session
 from flask_login import login_required, current_user
-from .models import User, Game, playing
+from .models import User, Game
 from . import db
 from werkzeug.security import generate_password_hash
 
@@ -116,23 +116,7 @@ def game_to_html(game_id):
                 <br>" + "Gifts range from " + str(obj.min_price) + "to " + str(obj.max_price) + "</p>\
             </div>\
         </article>\
-        </div>"
-
-    html_string_unjoined = "<div class=\"level-right\">\
-                <form action=\"/join_game/"+str(game_id)+"\">\
-                  <button>Join Game</button>\
-                </form>"
-
-    html_string_joined = "<div class=\"level-right\">\
-              <form action=\"/view_game/"+str(game_id)+"\">\
-                <button>Dislike</button>\
-              </form>"
-
-    if obj.is_playing(current_user):
-      html_string_base += html_string_joined
-    else:
-      if (obj.num_active_players > obj.max_capacity):
-        html_string_base += html_string_unjoined    
+        </div>"   
 
     # Finish off whatever button state the post had
     html_string_base += "</nav>"

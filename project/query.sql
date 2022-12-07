@@ -1,2 +1,4 @@
-SELECT * FROM user;
-SELECT * FROM game;
+CREATE TABLE joined_game (
+    player_id integer,
+    game_id integer
+);

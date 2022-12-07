@@ -62,9 +62,9 @@ class User(UserMixin, db.Model):
 
     def unjoin(self, game):
         if self.is_playing(game):
-            self.joined.remove(gift)
+            self.joined.remove(game)
 
-    def is_liking(self, game):
+    def is_playing(self, game):
         return self.joined.filter(
         joined_game.c.game_id == game.id).count() > 0   
 
@@ -99,7 +99,3 @@ class Game(UserMixin, db.Model):
     max_capacity = db.Column(db.Integer)
     max_price = db.Column(db.Integer)
     min_price = db.Column(db.Integer)
-    players = db.relationship('User', secondary=playing, lazy='dynamic', backref=db.backref('games', lazy=True))
-
-    def is_playing(self, user):
-        return self.players.filter(playing.c.user_id == user.id).count() > 0
