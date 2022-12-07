@@ -21,6 +21,10 @@ def game_creation_handler():
         max_price = request.form.get('max_price')
         min_price = request.form.get('min_price')
 
+        if not title or not max_capacity or not max_price or not min_price:
+          flash('Fill out all the fields!')
+          return redirect(url_for('games.game_created'))    
+
         new_game = Game(title=title, admin=current_user.username, num_active_players=0, max_capacity=max_capacity, max_price=max_price, min_price=min_price) \
         
         db.session.add(new_game)

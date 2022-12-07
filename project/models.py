@@ -71,7 +71,7 @@ class Game(UserMixin, db.Model):
     max_capacity = db.Column(db.Integer)
     max_price = db.Column(db.Integer)
     min_price = db.Column(db.Integer)
-    players = db.relationship('User', secondary=playing, lazy='subquery', backref=db.backref('games', lazy=True))
+    players = db.relationship('User', secondary=playing, lazy='dynamic', backref=db.backref('games', lazy=True))
 
     def is_playing(self, user):
         return self.players.filter(playing.c.user_id == user.id).count() > 0
