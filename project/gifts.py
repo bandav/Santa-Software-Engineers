@@ -26,10 +26,39 @@ def get_all_gifts():
       result.append(gift.id)
     return result
 
+@gifts.route('/like_gift/<id>')
+def like_gift(id):
+    gift = Gift.query.filter_by(id=id).first()
+    if current_user.is_liking(gift):
+        flash('This post has already been liked!')
+        # return redirect(url_for('prof.view_profile', id=id))
+    gift.likes += 1
+    current_user.like(gift)
+    db.session.commit()
+    if 'url' in cur_session:
+      return redirect(cur_session['url'])
+    else:
+      return redirect(url_for('main.profile', id=id))
+
+@gifts.route('/unlike_gift/<id>')
+def unlike_gift(id):
+    gift = Gift.query.filter_by(id=id).first()
+    if gift is None:
+        return redirect(url_for('index', id=id))
+    gift.likes -= 1
+    current_user.unlike(gift)
+    db.session.commit()
+    if 'url' in cur_session:
+      return redirect(cur_session['url'])
+    else:
+      return redirect(url_for('main.profile', id=id))
+
 def gift_to_html(gift_id):
  
     cur_session['url'] = request.url
     obj = Gift.query.filter_by(id=gift_id).first()
+
+    likes = obj.likes
 
     html_string_base = "<div class=\"box\"> \
         <article class=\"media\">\
@@ -41,10 +70,29 @@ def gift_to_html(gift_id):
                 <br>" + str(obj.description) + "</p>\
             </div>\
         </article>\
-        </div>"  
+        </div>"
+    
+    html_string_liked = "<div class=\"level-right\">\
+              <form action=\"/unlike_gift/"+str(gift_id)+"\">\
+                <button>Dislike</button>\
+              </form>"
+
+    html_string_unliked = "<div class=\"level-right\">\
+                <form action=\"/like_gift/"+str(gift_id)+"\">\
+                  <button>Like</button>\
+                </form>" 
+
+    if current_user.is_liking(obj):
+        html_string_base += html_string_liked
+    else:
+        html_string_base += html_string_unliked 
 
     # Finish off whatever button state the post had
-    html_string_base += "</nav>"
+    html_string_base += "<div class=\"level-left\">\
+              <p>\
+                Likes: " + str(likes) + "</p>\
+              </div>\
+            </nav>"
 
     # Finish off the whole html
     html_string_base += "</div>"

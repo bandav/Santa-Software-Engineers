@@ -25,6 +25,12 @@ playing = db.Table('playing',
     db.Column('game_id', db.Integer, db.ForeignKey('game.id'), primary_key=True)
 )
 
+# Likes in posts (reaction)
+liked_gift = db.Table('liked_gift',
+    db.Column('liking_id', db.Integer, db.ForeignKey('user.id')),
+    db.Column('liked_id', db.Integer, db.ForeignKey('gift.id'))
+)
+
 # Tables
 
 ###CREATE TABLE users (
@@ -40,6 +46,19 @@ class User(UserMixin, db.Model):
     displayname = db.Column(db.String(250))
     gift_choice = db.relationship('Gift', secondary=gift_choice, lazy='subquery', backref=db.backref('users', lazy=True))
 
+    liked = db.relationship('Gift', secondary=liked_gift,backref=db.backref('liked_gift', lazy='dynamic'), lazy='dynamic')
+    
+    def like(self, gift):
+        if not self.is_liking(gift):
+            self.liked.append(gift)
+
+    def unlike(self, gift):
+        if self.is_liking(gift):
+            self.liked.remove(gift)
+
+    def is_liking(self, gift):
+        return self.liked.filter(
+        liked_gift.c.liked_id == gift.id).count() > 0  
 
 ###CREATE TABLE gifts (
 ###gift_id integer PRIMARY KEY,
@@ -54,6 +73,7 @@ class Gift(UserMixin, db.Model):
     price = db.Column(db.Integer)
     description = db.Column(db.String(250))
     purchase_link = db.Column(db.String(250))
+    likes = db.Column(db.Integer)
 
 ###CREATE TABLE games (
 ###game_id integer PRIMARY KEY,
