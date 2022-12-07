@@ -37,6 +37,9 @@ def create_app():
     from .games import games as games_blueprint
     app.register_blueprint(games_blueprint)
 
+    from .gifts import gifts as gifts_blueprint
+    app.register_blueprint(gifts_blueprint)
+
     from .edit import edit as edit_blueprint
     app.register_blueprint(edit_blueprint)
 

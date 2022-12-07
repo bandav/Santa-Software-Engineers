@@ -1,0 +1,52 @@
+from flask import Blueprint, redirect, render_template, request, url_for, flash
+from flask import session as cur_session
+from flask_login import login_required, current_user
+from .models import User, Gift
+from . import db
+from werkzeug.security import generate_password_hash
+
+gifts = Blueprint('gifts', __name__)
+
+@gifts.route('/disp_all_gifts/<gift_num>')
+def disp_all_gifts(gift_num):  
+    gift_list = get_all_gifts()
+    if (len(gift_list) == 0):
+        return redirect(url_for('main.profile'))
+    gift_num = int(gift_num)
+    list_len = len(gift_list)
+    while (gift_num >= list_len):
+        gift_num-=1
+    gift_html = gift_to_html(gift_list[gift_num])
+    return render_template('explore_gifts.html', gift_num=gift_num, gift_html=gift_html, list_len=list_len)
+
+def get_all_gifts():   
+    all_gifts = Gift.query.all()
+    result = []
+    for gift in all_gifts:
+      result.append(gift.id)
+    return result
+
+def gift_to_html(gift_id):
+ 
+    cur_session['url'] = request.url
+    obj = Gift.query.filter_by(id=gift_id).first()
+
+    html_string_base = "<div class=\"box\"> \
+        <article class=\"media\">\
+          <div class=\"media-content\">\
+            <div class=\"content\">\
+              <p>\
+                <strong>" + str(obj.gift_name) + "</strong>\
+                <br>" + "Costs $" + str(obj.price) + "</p>\
+                <br>" + str(obj.description) + "</p>\
+            </div>\
+        </article>\
+        </div>"  
+
+    # Finish off whatever button state the post had
+    html_string_base += "</nav>"
+
+    # Finish off the whole html
+    html_string_base += "</div>"
+
+    return html_string_base
