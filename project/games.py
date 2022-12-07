@@ -59,6 +59,25 @@ def get_created_games(id):
       result.append(game.id)
     return result
 
+@games.route('/disp_all_games/<game_num>')
+def disp_all_games(game_num):  
+    game_list = get_all_games()
+    if (len(game_list) == 0):
+        return redirect(url_for('main.profile'))
+    game_num = int(game_num)
+    list_len = len(game_list)
+    while (game_num >= list_len):
+        game_num-=1
+    game_html = game_to_html(game_list[game_num])
+    return render_template('all_games.html', game_num=game_num, game_html=game_html, list_len=list_len)
+
+def get_all_games():   
+    all_games = Game.query.all()
+    result = []
+    for game in all_games:
+      result.append(game.id)
+    return result
+
 @games.route('/disp_joined_games/<id>/<game_num>')
 def disp_joined_games(id, game_num):
     game_list = get_joined_games(id)
@@ -73,7 +92,7 @@ def disp_joined_games(id, game_num):
     return render_template('joined_games.html', id=id, game_num=game_num, game_html=game_html, list_len=list_len)
 
 def get_joined_games(id): #FIXME: Not too sure about this query
-    joined_games = playing.query.filter(playing.user_id == id)
+    joined_games = playing.query.filter_by(playing.user_id == id)
     result = []
     for game in joined_games:
       result.append(game.id)
