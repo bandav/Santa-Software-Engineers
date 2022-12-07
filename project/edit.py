@@ -21,8 +21,8 @@ def update_profile():
     #TODO: CHECK OLD PASSWORD
 
     if not check_password_hash(current_user.password, oldpassword): 
-        flash('Please check your login details and try again.')
-        return redirect(url_for('edit.edit_profile')) # if user doesn't exist or password is wrong, reload the page
+        # flash('Please check your login details and try again.')
+        return "Wrong password entered. Try again" # if user doesn't exist or password is wrong, reload the page
 
     curr_user = User.query.filter_by(username=current_user.username).first()
     curr_user.displayname = displayname
