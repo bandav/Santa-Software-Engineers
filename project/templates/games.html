@@ -1,0 +1,16 @@
+<!-- templates/game.html -->
+
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="title">
+  Welcome, {{ name }}!
+</h1>
+  <h2 class="subtitle">
+    Click 'Start Game' to start the game!
+    <form method="POST" action="/start_game">
+        <button class="button is-block is-info is-large is-fullwidth" value="Start Game" name="action" button
+          style="margin:5px;">Start Game</button>
+      </form>
+  </h2>
+{% endblock %}
