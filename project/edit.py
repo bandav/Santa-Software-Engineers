@@ -9,6 +9,16 @@ edit = Blueprint('edit', __name__)
 
 @edit.route('/edit_profile', methods=['POST'])
 def edit_profile():
-    if request.form.get('action') == "Edit Profile":
-      print("making sure")
-      return render_template('edit_profile.html')
+  if request.form.get('action') == "Edit Profile":
+    return render_template('edit_profile.html', current_user = current_user.username)
+
+@edit.route('/edit_profile', methods=['POST'])
+def update_profile():
+  if request.form.get('action') == "Confirm":
+    return "HOLA"
+
+
+
+
+
+    
