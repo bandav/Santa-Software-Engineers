@@ -9,12 +9,18 @@ edit = Blueprint('edit', __name__)
 
 @edit.route('/edit_profile', methods=['POST'])
 def edit_profile():
-  if request.form.get('action') == "Edit Profile":
     return render_template('edit_profile.html', current_user = current_user.username)
 
-@edit.route('/edit_profile', methods=['POST'])
+@edit.route('/update_profile', methods=['POST'])
 def update_profile():
-  if request.form.get('action') == "Confirm":
+  if request.form.get('action') == "Confirm 2":
+    displayname = request.form.get('displayname')
+    oldpassword = request.form.get('oldpassword')
+    newpassword = request.form.get('newpassword')
+
+    print(displayname)
+    print(oldpassword)
+    print(newpassword)
     return "HOLA"
 
 
