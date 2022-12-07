@@ -6,6 +6,13 @@
     <h1 class="title">Create Game</h1>
     <div class="box">
 
+        {% for message in get_flashed_messages() %}
+        <div class="alert alert-warning">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+                {{ message }}
+            </div>
+        {% endfor %}
+
         <form method="POST" action="/game_created" enctype="multipart/form-data">
             <h3>Enter a title for your game:</h1>
             <input class="input" name="title" type="text" placeholder="Title">

@@ -7,9 +7,12 @@ from werkzeug.security import generate_password_hash
 
 games = Blueprint('games', __name__)
 
+@games.route('/show_create_game')
+def show_create_game():
+      return render_template('create_game.html')
+
 @games.route('/create_game', methods=['POST'])
 def create_game():
-    if request.form.get('action') == "Create Game":
       return render_template('create_game.html')
 
 @games.route('/game_created', methods=['POST'])
@@ -23,7 +26,8 @@ def game_creation_handler():
 
         if not title or not max_capacity or not max_price or not min_price:
           flash('Fill out all the fields!')
-          return redirect(url_for('games.game_created'))    
+          return redirect(url_for('games.show_create_game'))
+            
 
         new_game = Game(title=title, admin=current_user.username, num_active_players=0, max_capacity=max_capacity, max_price=max_price, min_price=min_price) \
         
