@@ -3,7 +3,7 @@ from flask import session as cur_session
 from flask_login import login_required, current_user
 from .models import User, Game, playing
 from . import db
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 
 edit = Blueprint('edit', __name__)
 
@@ -18,10 +18,18 @@ def update_profile():
     oldpassword = request.form.get('oldpassword')
     newpassword = request.form.get('newpassword')
 
-    print(displayname)
-    print(oldpassword)
-    print(newpassword)
-    return "HOLA"
+    #TODO: CHECK OLD PASSWORD
+
+    if not check_password_hash(current_user.password, oldpassword): 
+        flash('Please check your login details and try again.')
+        return redirect(url_for('edit.edit_profile')) # if user doesn't exist or password is wrong, reload the page
+
+    curr_user = User.query.filter_by(username=current_user.username).first()
+    curr_user.displayname = displayname
+    curr_user.password = generate_password_hash(newpassword, method='sha256')
+    db.session.commit()
+    
+    return redirect(url_for('main.index'))
 
 
 
