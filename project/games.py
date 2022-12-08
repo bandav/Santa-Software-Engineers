@@ -2,6 +2,8 @@ from flask import Blueprint, redirect, render_template, request, url_for, flash
 from flask import session as cur_session
 from flask_login import login_required, current_user
 from .models import User, Game
+from sqlalchemy.orm import Session
+from sqlalchemy import create_engine
 from . import db
 from werkzeug.security import generate_password_hash
 
@@ -51,6 +53,10 @@ def disp_created_games(id, game_num):
 def get_created_games(id):
     print("hit!!")
     print("id is this: " + id)
+    url = db.engine.url
+    engine = create_engine(url)
+    session = Session(bind=engine)
+    session.connection(execution_options={"isolation_level": "READ UNCOMMITTED"})  
     user = User.query.filter_by(id=id).first()
     print("user" + user.username)     
     created_games = Game.query.filter_by(admin=user.username)
@@ -58,6 +64,7 @@ def get_created_games(id):
     result = []
     for game in created_games:
       result.append(game.id)
+    session.commit()
     return result
 
 @games.route('/disp_all_games/<game_num>')
@@ -101,30 +108,40 @@ def get_joined_games(id):
 
 @games.route('/join_game/<id>')
 def join_game(id):
-    game = Game.query.filter_by(id=id).first()
-    if current_user.is_playing(game):
-        flash("You're already playing this game!")
-        return redirect(url_for('main.profile'))
-    game.num_active_players += 1
-    current_user.join(game)
-    db.session.commit()
-    if 'url' in cur_session:
-      return redirect(cur_session['url'])
-    else:
+  url = db.engine.url
+  engine = create_engine(url)
+  session = Session(bind=engine)
+  session.connection(execution_options={"isolation_level": "READ UNCOMMITTED"})  
+  game = Game.query.filter_by(id=id).first()
+  if current_user.is_playing(game):
+      flash("You're already playing this game!")
       return redirect(url_for('main.profile'))
+  game.num_active_players += 1
+  current_user.join(game)
+  session.commit()
+  db.session.commit()
+  if 'url' in cur_session:
+    return redirect(cur_session['url'])
+  else:
+    return redirect(url_for('main.profile'))
 
 @games.route('/unjoin_game/<id>')
 def unjoin_game(id):
-    game = Game.query.filter_by(id=id).first()
-    if game is None:
-        return redirect(url_for('index', id=id))
-    game.num_active_players -= 1
-    current_user.unjoin(game)
-    db.session.commit()
-    if 'url' in cur_session:
-      return redirect(cur_session['url'])
-    else:
-      return redirect(url_for('main.profile')) 
+  url = db.engine.url
+  engine = create_engine(url)
+  session = Session(bind=engine)
+  session.connection(execution_options={"isolation_level": "READ UNCOMMITTED"})  
+  game = Game.query.filter_by(id=id).first()
+  if game is None:
+      return redirect(url_for('index', id=id))
+  game.num_active_players -= 1
+  current_user.unjoin(game)
+  session.commit()
+  db.session.commit()
+  if 'url' in cur_session:
+    return redirect(cur_session['url'])
+  else:
+    return redirect(url_for('main.profile')) 
 
 def game_to_html(game_id):
  
@@ -177,21 +194,25 @@ def game_to_html(game_id):
 
 @games.route('/view_game/<game_num>')
 def view_game(game_num): 
-    game_num = int(game_num)
-    game_list = get_all_games()
-    list_len = len(game_list)
-    if (game_num > 0):
-      game_num -= 1
+  url = db.engine.url
+  engine = create_engine(url)
+  session = Session(bind=engine)
+  session.connection(execution_options={"isolation_level": "READ UNCOMMITTED"})  
+  game_num = int(game_num)
+  game_list = get_all_games()
+  list_len = len(game_list)
+  if (game_num > 0):
+    game_num -= 1
 
-    game = Game.query.filter_by(id=game_list[game_num]).first()
+  game = Game.query.filter_by(id=game_list[game_num]).first()
 
-    is_admin = False
-    if (game.admin == current_user.username):
-      is_admin = True
+  is_admin = False
+  if (game.admin == current_user.username):
+    is_admin = True
 
-    view_game_html = view_game_to_html(game_list[game_num])
-
-    return render_template('view_game.html', name=current_user.username, game_num=game_num, view_game_html=view_game_html, list_len=list_len, is_admin=is_admin)
+  view_game_html = view_game_to_html(game_list[game_num])
+  session.commit()
+  return render_template('view_game.html', name=current_user.username, game_num=game_num, view_game_html=view_game_html, list_len=list_len, is_admin=is_admin)
 
 def view_game_to_html(game_id):   
     cur_session['url'] = request.url
