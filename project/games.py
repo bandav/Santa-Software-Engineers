@@ -40,7 +40,7 @@ def game_creation_handler():
 def disp_created_games(id, game_num):  
     game_list = get_created_games(id)
     if (len(game_list) == 0):
-        return redirect(url_for('main.profile'))
+        return "You have no created games. Go back and create one!"
     game_num = int(game_num)
     list_len = len(game_list)
     while (game_num >= list_len):
@@ -64,7 +64,7 @@ def get_created_games(id):
 def disp_all_games(game_num):  
     game_list = get_all_games()
     if (len(game_list) == 0):
-        return redirect(url_for('main.profile'))
+        return "No games right now!"
     game_num = int(game_num)
     list_len = len(game_list)
     while (game_num >= list_len):
@@ -83,7 +83,7 @@ def get_all_games():
 def disp_joined_games(id, game_num):
     game_list = get_joined_games(id)
     if (not game_list or len(game_list) == 0):
-        return redirect(url_for('main.profile'))
+        return "You have no joined games. Go back to join one!"
     game_num = int(game_num)
     list_len = len(game_list)
     while (game_num >= list_len):
