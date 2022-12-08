@@ -21,3 +21,8 @@ def games():
     # FIXME: Provide the correct parameters to the game
     return render_template('games.html', name=current_user.displayname)
     # testinggg
+
+
+@main.route('/likes')
+def likes():
+    return render_template('likes.html', name = current_user.displayname, id = current_user.id)

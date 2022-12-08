@@ -23,6 +23,9 @@
                             <a href="{{ url_for('main.index') }}" class="navbar-item">
                                 Home
                             </a>
+                            <a href="{{ url_for('main.likes') }}" class="navbar-item">
+                                My likes
+                            </a>
                             {% if current_user.is_authenticated %}
                             <a href="{{ url_for('main.profile') }}" class="navbar-item">
                                 Profile
