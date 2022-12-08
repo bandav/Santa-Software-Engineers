@@ -158,7 +158,7 @@ def game_to_html(game_id):
     if current_user.is_playing(obj):
       html_string_base += html_string_joined
     else:
-      if (obj.num_active_players < obj.max_capacity):
+      if (obj.num_active_players < obj.max_capacity) and obj.admin != current_user.username:
         html_string_base += html_string_unjoined 
   
 
