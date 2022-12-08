@@ -15,6 +15,10 @@ def show_create_game():
 def create_game():
       return render_template('create_game.html')
 
+@games.route('/view_game/<game_num>', methods=['POST'])
+def view_game():
+    return render_template('games.html', name=current_user.displayname)
+
 @games.route('/game_created', methods=['POST'])
 def game_creation_handler():
     if request.form.get('action') == "Game Created": 
@@ -140,22 +144,28 @@ def game_to_html(game_id):
               <p>\
                 <strong>" + str(obj.title) + "</strong>\
                 <br>" + "Created by: @" + str(admin.username) + "</p>\
-                <br>" + str(obj.num_active_players) + "/" + str(obj.max_capacity) + "</p>\
-                <br>" + "Gifts range from " + str(obj.min_price) + "to " + str(obj.max_price) + "</p>\
+                <br>" + "Capacity: " + str(obj.num_active_players) + "/" + str(obj.max_capacity) + "</p>\
+                <br>" + "Gifts range from $" + str(obj.min_price) + " to $" + str(obj.max_price) + "</p>\
             </div>\
         </article>\
         </div>"
 
-    html_string_unjoined = "<div class=\"level-right\">\
+    html_string_unjoined = "\
                 <form action=\"/join_game/"+str(game_id)+"\">\
-                  <button>Join Game</button>\
+                  <button class=\"button is-block is-black is-medium is-fullwidth\">Join Game</button>\
                 </form>"
 
-    html_string_joined = "<div class=\"level-right\">\
+    html_string_joined = "\
               <form action=\"/unjoin_game/"+str(game_id)+"\">\
-                <button>Leave Game</button>\
+                <button class=\"button is-block is-black is-medium is-fullwidth\">Leave Game</button>\
               </form>"
 
+    html_string_view = "<div class=\"level-right\"> \
+              <form action=\"/view_game/"+str(game_id)+"\">\
+                <button class=\"button is-block is-black is-medium is-fullwidth\" >View Game</button>\
+              </form>"
+
+    html_string_base += html_string_view
     if current_user.is_playing(obj) and obj.admin != current_user.username:
       html_string_base += html_string_joined
     else:

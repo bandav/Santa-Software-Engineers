@@ -74,6 +74,7 @@ class User(UserMixin, db.Model):
 ###price_range_id integer, //FK to price_ranges
 ###description varchar(250),
 ###purchase_link varchar(250)
+###likes integer
 ###);
 class Gift(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True) # primary keys are required by SQLAlchemy

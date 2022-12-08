@@ -74,12 +74,12 @@ def gift_to_html(gift_id):
     
     html_string_liked = "<div class=\"level-right\">\
               <form action=\"/unlike_gift/"+str(gift_id)+"\">\
-                <button>Dislike</button>\
+                <button  class=\"button is-block is-black is-normal is-fullwidth\">Dislike</button>\
               </form>"
 
     html_string_unliked = "<div class=\"level-right\">\
                 <form action=\"/like_gift/"+str(gift_id)+"\">\
-                  <button>Like</button>\
+                  <button  class=\"button is-block is-black is-normal is-fullwidth\">Like</button>\
                 </form>" 
 
     if current_user.is_liking(obj):
