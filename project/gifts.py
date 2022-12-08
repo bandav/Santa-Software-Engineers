@@ -1,6 +1,8 @@
 from flask import Blueprint, redirect, render_template, request, url_for, flash
 from flask import session as cur_session
 from flask_login import login_required, current_user
+from sqlalchemy.orm import Session
+from sqlalchemy import create_engine
 from .models import User, Gift
 from . import db
 from werkzeug.security import generate_password_hash
@@ -9,6 +11,10 @@ gifts = Blueprint('gifts', __name__)
 
 @gifts.route('/disp_all_gifts/<gift_num>')
 def disp_all_gifts(gift_num):  
+    url = db.engine.url
+    engine = create_engine(url)
+    cur_session = Session(bind=engine)
+    cur_session.connection(execution_options={"isolation_level": "READ UNCOMMITTED"})   
     gift_list = get_all_gifts()
     if (len(gift_list) == 0):
         return redirect(url_for('main.profile'))
@@ -17,13 +23,19 @@ def disp_all_gifts(gift_num):
     while (gift_num >= list_len):
         gift_num-=1
     gift_html = gift_to_html(gift_list[gift_num])
+    cur_session.commit()
     return render_template('explore_gifts.html', gift_num=gift_num, gift_html=gift_html, list_len=list_len)
 
-def get_all_gifts():   
+def get_all_gifts(): 
+    url = db.engine.url
+    engine = create_engine(url)
+    cur_session = Session(bind=engine)
+    cur_session.connection(execution_options={"isolation_level": "READ UNCOMMITTED"})  
     all_gifts = Gift.query.all()
     result = []
     for gift in all_gifts:
       result.append(gift.id)
+    cur_session.commit()
     return result
 
 @gifts.route('/like_gift/<id>')
@@ -74,12 +86,12 @@ def gift_to_html(gift_id):
     
     html_string_liked = "<div class=\"level-right\">\
               <form action=\"/unlike_gift/"+str(gift_id)+"\">\
-                <button class=\"button is-block is-black  is-normal is-fullwidth\">Dislike</button>\
+                <button>Dislike</button>\
               </form>"
 
     html_string_unliked = "<div class=\"level-right\">\
                 <form action=\"/like_gift/"+str(gift_id)+"\">\
-                  <button class=\"button is-block is-black  is-normal is-fullwidth\">Like</button>\
+                  <button>Like</button>\
                 </form>" 
 
     if current_user.is_liking(obj):
