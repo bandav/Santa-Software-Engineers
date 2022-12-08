@@ -1,6 +1,7 @@
 SELECT * FROM gift;
 
 SELECT * FROM liked_gift;
+SELECT * FROM joined_game;
 
 
 DELETE FROM gift WHERE id=1;

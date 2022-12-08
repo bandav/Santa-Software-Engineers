@@ -114,7 +114,7 @@ def join_game(id):
       return redirect(url_for('main.profile'))
 
 @games.route('/unjoin_game/<id>')
-def unjoin_gift(id):
+def unjoin_game(id):
     game = Game.query.filter_by(id=id).first()
     if game is None:
         return redirect(url_for('index', id=id))
@@ -167,6 +167,92 @@ def game_to_html(game_id):
         html_string_base += html_string_unjoined 
   
 
+    # Finish off whatever button state the post had
+    html_string_base += "</nav>"
+
+    # Finish off the whole html
+    html_string_base += "</div>"
+
+    return html_string_base
+
+@games.route('/view_game/<game_num>')
+def view_game(game_num): 
+    game_num = int(game_num)
+    game_list = get_all_games()
+    list_len = len(game_list)
+    if (game_num > 0):
+      game_num -= 1
+
+    game = Game.query.filter_by(id=game_list[game_num]).first()
+
+    is_admin = False
+    if (game.admin == current_user.username):
+      is_admin = True
+
+    view_game_html = view_game_to_html(game_list[game_num])
+
+    return render_template('view_game.html', name=current_user.username, game_num=game_num, view_game_html=view_game_html, list_len=list_len, is_admin=is_admin)
+
+def view_game_to_html(game_id):   
+    cur_session['url'] = request.url
+    game = Game.query.filter_by(id=game_id).first()
+    admin = User.query.filter_by(username=game.admin).first()
+    all_users = User.query.all()
+    players = []
+
+    for user in all_users:
+      if (User.is_playing(user, game)):
+        players.append(user)
+
+    html_string_base = "<div class=\"box\"> \
+        <article class=\"media\">\
+          <div class=\"media-content\">\
+            <div class=\"content\">\
+              <p>\
+                <strong>" + str(game.title) + "</strong>\
+                <br>" + "Created by: @" + str(admin.username) + "</p>\
+                <br> Capacity: " + str(game.num_active_players) + "/" + str(game.max_capacity) + "</p>\
+                <br> Gifts range from $" + str(game.min_price) + " to $" + str(game.max_price) + "</p>"
+    
+    html_string_end_base = "\
+      </div>\
+        </article>\
+        </div>"
+    
+    #adding player list
+    count = 1
+    html_string_base += "<br>"
+    for player in players:
+      html_string_base += "Player " + str(count) + ": " + player.username + "<br>"
+      count += 1
+
+    html_string_base += html_string_end_base
+
+    html_string_unjoined = "<div class=\"level-right\">\
+      <form action=\"/join_game/"+str(game_id)+"\">\
+                  <button class=\"button is-block is-black is-medium is-fullwidth\">Join Game</button>\
+                </form>"
+
+    html_string_joined = "<div class=\"level-right\">\
+       <form action=\"/unjoin_game/"+str(game_id)+"\">\
+                <button class=\"button is-block is-black is-medium is-fullwidth\" button style=\"margin:5px\">Leave Game</button>\
+              </form>"
+    
+    html_string_start = "<div class=\"level-right\"><form action=\"/start_game/"+str(game_id)+"\">\
+                <button class=\"button is-block is-black is-medium is-fullwidth\" button style=\"margin:5px\">Start Game</button>\
+              </form>"
+
+    if current_user.is_playing(game) and game.admin != current_user.username:
+      html_string_base += html_string_joined
+    else:
+      if (game.num_active_players < game.max_capacity) and game.admin != current_user.username:
+        html_string_base += html_string_unjoined 
+  
+    if game.admin == current_user.username:
+      html_string_base += html_string_start
+    elif game.admin == current_user.username and game.num_active_players < game.max_capacity:
+      html_string_base += "Not enough players to start game"
+    
     # Finish off whatever button state the post had
     html_string_base += "</nav>"
 
