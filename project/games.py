@@ -210,36 +210,38 @@ def view_game_to_html(game_id):
             <div class=\"content\">\
               <p>\
                 <strong>" + str(game.title) + "</strong>\
-                <br>" + "Created by: @" + str(admin.username) + "</p>\
-                <br> Capacity: " + str(game.num_active_players) + "/" + str(game.max_capacity) + "</p>\
-                <br> Gifts range from $" + str(game.min_price) + " to $" + str(game.max_price) + "</p>"
+                <br>" + "Created by: @" + str(admin.username) + "<br>\
+                <br> Capacity: " + str(game.num_active_players) + "/" + str(game.max_capacity) + "<br> *Game will automatically start once capacity is met<br>\
+                <br> Gifts range from $" + str(game.min_price) + " to $" + str(game.max_price)
     
-    html_string_end_base = "\
+    html_string_end_base = "</p>\
       </div>\
         </article>\
-        </div>"
+        </div>\
+          <div class=\"level-right\">"
     
     #adding player list
     count = 1
-    html_string_base += "<br>"
+    html_string_base += "<br>\
+      <br>"
     for player in players:
       html_string_base += "Player " + str(count) + ": " + player.username + "<br>"
       count += 1
 
     html_string_base += html_string_end_base
 
-    html_string_unjoined = "<div class=\"level-right\">\
+    html_string_unjoined = "\
       <form action=\"/join_game/"+str(game_id)+"\">\
                   <button class=\"button is-block is-black is-medium is-fullwidth\">Join Game</button>\
                 </form>"
 
-    html_string_joined = "<div class=\"level-right\">\
+    html_string_joined = "\
        <form action=\"/unjoin_game/"+str(game_id)+"\">\
                 <button class=\"button is-block is-black is-medium is-fullwidth\" button style=\"margin:5px\">Leave Game</button>\
               </form>"
     
-    html_string_start = "<div class=\"level-right\"><form action=\"/start_game/"+str(game_id)+"\">\
-                <button class=\"button is-block is-black is-medium is-fullwidth\" button style=\"margin:5px\">Start Game</button>\
+    html_string_shuffle = "<form action=\"/start_game/"+str(game_id)+"\">\
+                <button class=\"button is-block is-black is-medium is-fullwidth\" button style=\"margin:5px\">Assign Secret Santas</button>\
               </form>"
 
     if current_user.is_playing(game) and game.admin != current_user.username:
@@ -248,8 +250,8 @@ def view_game_to_html(game_id):
       if (game.num_active_players < game.max_capacity) and game.admin != current_user.username:
         html_string_base += html_string_unjoined 
   
-    if game.admin == current_user.username:
-      html_string_base += html_string_start
+    if game.admin == current_user.username and game.num_active_players == game.max_capacity:
+      html_string_base += html_string_shuffle
     elif game.admin == current_user.username and game.num_active_players < game.max_capacity:
       html_string_base += "Not enough players to start game"
     
