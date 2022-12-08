@@ -15,6 +15,7 @@ def index():
 def profile():
     return render_template('profile.html', name=current_user.displayname, id=current_user.id)
 
+# TODO ARE WE STILL USING THIS??
 @main.route('/games')
 @login_required
 def games():
