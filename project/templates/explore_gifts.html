@@ -2,12 +2,18 @@
 
 {% block content %}
 
-# TODO: Add flash messages clause
-
 <div class="columns is-2 is-offset-2">
   <div class="column">
     <h1 class="title">Gift #{{ gift_num }}</h1>
     <div class="box">
+
+          {% for message in get_flashed_messages() %}
+          <div class="alert alert-warning">
+              <button type="button" class="close" data-dismiss="alert">&times;</button>
+                  {{ message }}
+              </div>
+          {% endfor %}
+
           {{ gift_html|safe }}
     </div>
 

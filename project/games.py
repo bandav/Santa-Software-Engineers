@@ -82,7 +82,6 @@ def get_all_games():
 def disp_joined_games(id, game_num):
     game_list = get_joined_games(id)
     if (not game_list or len(game_list) == 0):
-        flash("You haven't joined any games!")
         return redirect(url_for('main.profile'))
     game_num = int(game_num)
     list_len = len(game_list)
@@ -91,12 +90,40 @@ def disp_joined_games(id, game_num):
     game_html = game_to_html(game_list[game_num])
     return render_template('joined_games.html', id=id, game_num=game_num, game_html=game_html, list_len=list_len)
 
-def get_joined_games(id): #FIXME: Not too sure about this query
-    joined_games = playing.query.filter_by(playing.user_id == id)
+def get_joined_games(id):
+    all_games = Game.query.all()
     result = []
-    for game in joined_games:
-      result.append(game.id)
+    for game in all_games:
+      if current_user.is_playing(game):
+        result.append(game.id)
     return result
+
+@games.route('/join_game/<id>')
+def join_game(id):
+    game = Game.query.filter_by(id=id).first()
+    if current_user.is_playing(game):
+        flash("You're already playing this game!")
+        return redirect(url_for('main.profile'))
+    game.num_active_players += 1
+    current_user.join(game)
+    db.session.commit()
+    if 'url' in cur_session:
+      return redirect(cur_session['url'])
+    else:
+      return redirect(url_for('main.profile'))
+
+@games.route('/unjoin_game/<id>')
+def unjoin_gift(id):
+    game = Game.query.filter_by(id=id).first()
+    if game is None:
+        return redirect(url_for('index', id=id))
+    game.num_active_players -= 1
+    current_user.unjoin(game)
+    db.session.commit()
+    if 'url' in cur_session:
+      return redirect(cur_session['url'])
+    else:
+      return redirect(url_for('main.profile')) 
 
 def game_to_html(game_id):
  
@@ -116,7 +143,24 @@ def game_to_html(game_id):
                 <br>" + "Gifts range from " + str(obj.min_price) + "to " + str(obj.max_price) + "</p>\
             </div>\
         </article>\
-        </div>"   
+        </div>"
+
+    html_string_unjoined = "<div class=\"level-right\">\
+                <form action=\"/join_game/"+str(game_id)+"\">\
+                  <button>Join Game</button>\
+                </form>"
+
+    html_string_joined = "<div class=\"level-right\">\
+              <form action=\"/unjoin_game/"+str(game_id)+"\">\
+                <button>Leave Game</button>\
+              </form>"
+
+    if current_user.is_playing(obj):
+      html_string_base += html_string_joined
+    else:
+      if (obj.num_active_players < obj.max_capacity):
+        html_string_base += html_string_unjoined 
+  
 
     # Finish off whatever button state the post had
     html_string_base += "</nav>"

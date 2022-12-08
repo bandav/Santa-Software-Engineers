@@ -30,8 +30,8 @@ def get_all_gifts():
 def like_gift(id):
     gift = Gift.query.filter_by(id=id).first()
     if current_user.is_liking(gift):
-        flash('This post has already been liked!')
-        # return redirect(url_for('prof.view_profile', id=id))
+        flash("You've already liked this gift!")
+        return redirect(url_for('main.profile'))
     gift.likes += 1
     current_user.like(gift)
     db.session.commit()
