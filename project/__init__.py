@@ -42,6 +42,9 @@ def create_app():
 
     from .edit import edit as edit_blueprint
     app.register_blueprint(edit_blueprint)
+    
+    from .likes import likes as likes_blueprint
+    app.register_blueprint(likes_blueprint)
 
     with app.app_context():
         db.create_all()
