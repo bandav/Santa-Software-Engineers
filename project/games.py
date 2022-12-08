@@ -250,7 +250,7 @@ def view_game_to_html(game_id):
     capacity_str = ""
     if game.num_active_players == game.max_capacity:
       secret_santa = get_secret_santa(game_id)
-      capacity_str = "<br>*Game has started. Your secret santa is <strong>" + secret_santa.username + "</strong>! <br> Click the button below to view your secret santa's wish list <br>"
+      capacity_str = "<br>Game has started. You're the Secret Santa for <strong>" + secret_santa.username + "</strong>! <br> *Click the button below to view their wish list <br>"
       #TODO FIX METHOD TO REDIRECT TO
       html_string_shuffle = "<form action=\"/disp_all_gifts/1\">\
             <button class=\"button is-block is-black is-medium is-fullwidth\" button style=\"margin:10px\">View " + secret_santa.username + "'s Gift List</button>\
