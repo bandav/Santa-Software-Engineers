@@ -140,22 +140,26 @@ def game_to_html(game_id):
               <p>\
                 <strong>" + str(obj.title) + "</strong>\
                 <br>" + "Created by: @" + str(admin.username) + "</p>\
-                <br>" + str(obj.num_active_players) + "/" + str(obj.max_capacity) + "</p>\
-                <br>" + "Gifts range from " + str(obj.min_price) + "to " + str(obj.max_price) + "</p>\
+                <br>" + "Capacity: " + str(obj.num_active_players) + "/" + str(obj.max_capacity) + "</p>\
+                <br>" + "Gifts range from $" + str(obj.min_price) + " to $" + str(obj.max_price) + "</p>\
             </div>\
         </article>\
         </div>"
 
-    html_string_unjoined = "<div class=\"level-right\">\
-                <form action=\"/join_game/"+str(game_id)+"\">\
-                  <button>Join Game</button>\
+    html_string_unjoined = "<form action=\"/join_game/"+str(game_id)+"\">\
+                  <button class=\"button is-block is-black is-medium is-fullwidth\">Join Game</button>\
                 </form>"
 
-    html_string_joined = "<div class=\"level-right\">\
-              <form action=\"/unjoin_game/"+str(game_id)+"\">\
-                <button>Leave Game</button>\
+    html_string_joined = " <form action=\"/unjoin_game/"+str(game_id)+"\">\
+                <button class=\"button is-block is-black is-medium is-fullwidth\" button style=\"margin:5px\">Leave Game</button>\
               </form>"
 
+    html_string_view = "<div class=\"level-right\">\
+              <form action=\"/view_game/"+str(game_id)+"\">\
+                <button class=\"button is-block is-black  is-medium is-fullwidth\">View Game</button>\
+              </form>"
+
+    html_string_base += html_string_view
     if current_user.is_playing(obj) and obj.admin != current_user.username:
       html_string_base += html_string_joined
     else:
