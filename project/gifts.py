@@ -90,8 +90,8 @@ def gift_to_html(gift_id):
                 <strong>" + str(obj.gift_name) + "</strong>\
                 <br>" + "Costs $" + str(obj.price) + "</p>\
                 <br>" + str(obj.description) + "</p>\
-            </div>\
-        </article>\
+                <button class=\"button is-block is-link is-normal\" button style=\"margin:5px\"><a href=" + str(obj.purchase_link) + ">Link to Gift</a></button><div class=\"field is-grouped\" style=\"padding-top: 10px;\">"
+    html_string_base += "</article>\
         </div>"
     
     html_string_liked = "<div class=\"level-right\">\
