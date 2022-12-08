@@ -30,14 +30,12 @@
                             <a href="{{ url_for('main.profile') }}" class="navbar-item">
                                 Profile
                             </a>
-                            <form action="/disp_all_games/0">
-                                <button class="navbar-item" value="All Games" name="action" button
-                                  style="margin:5px;">All Games</button>
-                            </form>
-                            <form action="/disp_all_gifts/0">
-                                <button class="navbar-item" value="All Gifts" name="action" button
-                                  style="margin:5px;">Explore Gifts</button>
-                            </form>
+                            <a href="{{ url_for('games.disp_all_games', game_num=0)}}" class="navbar-item">
+                                All Games
+                            </a>
+                            <a href="{{ url_for('gifts.disp_all_gifts', gift_num=0)}}" class="navbar-item">
+                                All Gifts
+                            </a>
                             {% endif %}
                             {% if not current_user.is_authenticated %}
                             <a href="{{ url_for('auth.login') }}" class="navbar-item">
