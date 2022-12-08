@@ -29,7 +29,8 @@ def game_creation_handler():
           return redirect(url_for('games.show_create_game'))
             
 
-        new_game = Game(title=title, admin=current_user.username, num_active_players=0, max_capacity=max_capacity, max_price=max_price, min_price=min_price) \
+        new_game = Game(title=title, admin=current_user.username, num_active_players=1, max_capacity=max_capacity, max_price=max_price, min_price=min_price)
+        current_user.join(new_game)
         
         db.session.add(new_game)
         db.session.commit()
@@ -39,7 +40,7 @@ def game_creation_handler():
 def disp_created_games(id, game_num):  
     game_list = get_created_games(id)
     if (len(game_list) == 0):
-        return redirect(url_for('main.profile'))
+        return "You have no created games. Go back and create one!"
     game_num = int(game_num)
     list_len = len(game_list)
     while (game_num >= list_len):
@@ -63,7 +64,7 @@ def get_created_games(id):
 def disp_all_games(game_num):  
     game_list = get_all_games()
     if (len(game_list) == 0):
-        return redirect(url_for('main.profile'))
+        return "No games right now!"
     game_num = int(game_num)
     list_len = len(game_list)
     while (game_num >= list_len):
@@ -82,7 +83,7 @@ def get_all_games():
 def disp_joined_games(id, game_num):
     game_list = get_joined_games(id)
     if (not game_list or len(game_list) == 0):
-        return redirect(url_for('main.profile'))
+        return "You have no joined games. Go back to join one!"
     game_num = int(game_num)
     list_len = len(game_list)
     while (game_num >= list_len):
@@ -139,26 +140,30 @@ def game_to_html(game_id):
               <p>\
                 <strong>" + str(obj.title) + "</strong>\
                 <br>" + "Created by: @" + str(admin.username) + "</p>\
-                <br>" + str(obj.num_active_players) + "/" + str(obj.max_capacity) + "</p>\
-                <br>" + "Gifts range from " + str(obj.min_price) + "to " + str(obj.max_price) + "</p>\
+                <br>" + "Capacity: " + str(obj.num_active_players) + "/" + str(obj.max_capacity) + "</p>\
+                <br>" + "Gifts range from $" + str(obj.min_price) + " to $" + str(obj.max_price) + "</p>\
             </div>\
         </article>\
         </div>"
 
-    html_string_unjoined = "<div class=\"level-right\">\
-                <form action=\"/join_game/"+str(game_id)+"\">\
-                  <button>Join Game</button>\
+    html_string_unjoined = "<form action=\"/join_game/"+str(game_id)+"\">\
+                  <button class=\"button is-block is-black is-medium is-fullwidth\">Join Game</button>\
                 </form>"
 
-    html_string_joined = "<div class=\"level-right\">\
-              <form action=\"/unjoin_game/"+str(game_id)+"\">\
-                <button>Leave Game</button>\
+    html_string_joined = " <form action=\"/unjoin_game/"+str(game_id)+"\">\
+                <button class=\"button is-block is-black is-medium is-fullwidth\" button style=\"margin:5px\">Leave Game</button>\
               </form>"
 
-    if current_user.is_playing(obj):
+    html_string_view = "<div class=\"level-right\">\
+              <form action=\"/view_game/"+str(game_id)+"\">\
+                <button class=\"button is-block is-black  is-medium is-fullwidth\">View Game</button>\
+              </form>"
+
+    html_string_base += html_string_view
+    if current_user.is_playing(obj) and obj.admin != current_user.username:
       html_string_base += html_string_joined
     else:
-      if (obj.num_active_players < obj.max_capacity):
+      if (obj.num_active_players < obj.max_capacity) and obj.admin != current_user.username:
         html_string_base += html_string_unjoined 
   
 
