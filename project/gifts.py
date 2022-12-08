@@ -13,8 +13,8 @@ gifts = Blueprint('gifts', __name__)
 def disp_all_gifts(gift_num):  
     url = db.engine.url
     engine = create_engine(url)
-    cur_session = Session(bind=engine)
-    cur_session.connection(execution_options={"isolation_level": "READ UNCOMMITTED"})   
+    session = Session(bind=engine)
+    session.connection(execution_options={"isolation_level": "READ UNCOMMITTED"})   
     gift_list = get_all_gifts()
     if (len(gift_list) == 0):
         return redirect(url_for('main.profile'))
@@ -23,47 +23,57 @@ def disp_all_gifts(gift_num):
     while (gift_num >= list_len):
         gift_num-=1
     gift_html = gift_to_html(gift_list[gift_num])
-    cur_session.commit()
+    session.commit()
     return render_template('explore_gifts.html', gift_num=gift_num, gift_html=gift_html, list_len=list_len)
 
 def get_all_gifts(): 
     url = db.engine.url
     engine = create_engine(url)
-    cur_session = Session(bind=engine)
-    cur_session.connection(execution_options={"isolation_level": "READ UNCOMMITTED"})  
+    session = Session(bind=engine)
+    session.connection(execution_options={"isolation_level": "READ UNCOMMITTED"})  
     all_gifts = Gift.query.all()
     result = []
     for gift in all_gifts:
       result.append(gift.id)
-    cur_session.commit()
+    session.commit()
     return result
 
 @gifts.route('/like_gift/<id>')
 def like_gift(id):
-    gift = Gift.query.filter_by(id=id).first()
-    if current_user.is_liking(gift):
-        flash("You've already liked this gift!")
-        return redirect(url_for('main.profile'))
-    gift.likes += 1
-    current_user.like(gift)
-    db.session.commit()
-    if 'url' in cur_session:
-      return redirect(cur_session['url'])
-    else:
-      return redirect(url_for('main.profile', id=id))
+  url = db.engine.url
+  engine = create_engine(url)
+  session = Session(bind=engine)
+  session.connection(execution_options={"isolation_level": "READ UNCOMMITTED"})  
+  gift = Gift.query.filter_by(id=id).first()
+  if current_user.is_liking(gift):
+      flash("You've already liked this gift!")
+      return redirect(url_for('main.profile'))
+  gift.likes += 1
+  current_user.like(gift)
+  session.commit()
+  db.session.commit()
+  if 'url' in cur_session:
+    return redirect(cur_session['url'])
+  else:
+    return redirect(url_for('main.profile', id=id))
 
 @gifts.route('/unlike_gift/<id>')
 def unlike_gift(id):
-    gift = Gift.query.filter_by(id=id).first()
-    if gift is None:
-        return redirect(url_for('index', id=id))
-    gift.likes -= 1
-    current_user.unlike(gift)
-    db.session.commit()
-    if 'url' in cur_session:
-      return redirect(cur_session['url'])
-    else:
-      return redirect(url_for('main.profile', id=id))
+  url = db.engine.url
+  engine = create_engine(url)
+  session = Session(bind=engine)
+  session.connection(execution_options={"isolation_level": "READ UNCOMMITTED"})  
+  gift = Gift.query.filter_by(id=id).first()
+  if gift is None:
+      return redirect(url_for('index', id=id))
+  gift.likes -= 1
+  current_user.unlike(gift)
+  session.commit()
+  db.session.commit()
+  if 'url' in cur_session:
+    return redirect(cur_session['url'])
+  else:
+    return redirect(url_for('main.profile', id=id))
 
 def gift_to_html(gift_id):
  
