@@ -29,7 +29,8 @@ def game_creation_handler():
           return redirect(url_for('games.show_create_game'))
             
 
-        new_game = Game(title=title, admin=current_user.username, num_active_players=0, max_capacity=max_capacity, max_price=max_price, min_price=min_price) \
+        new_game = Game(title=title, admin=current_user.username, num_active_players=1, max_capacity=max_capacity, max_price=max_price, min_price=min_price)
+        current_user.join(new_game)
         
         db.session.add(new_game)
         db.session.commit()
@@ -155,7 +156,7 @@ def game_to_html(game_id):
                 <button>Leave Game</button>\
               </form>"
 
-    if current_user.is_playing(obj):
+    if current_user.is_playing(obj) and obj.admin != current_user.username:
       html_string_base += html_string_joined
     else:
       if (obj.num_active_players < obj.max_capacity) and obj.admin != current_user.username:
