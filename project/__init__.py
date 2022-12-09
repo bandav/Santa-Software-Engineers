@@ -46,6 +46,9 @@ def create_app():
     from .likes import likes as likes_blueprint
     app.register_blueprint(likes_blueprint)
 
+    from .stats import stats as stats_blueprint
+    app.register_blueprint(stats_blueprint)
+
     with app.app_context():
         db.create_all()
 

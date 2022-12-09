@@ -2,6 +2,8 @@ from flask import Blueprint, redirect, render_template, request, url_for, flash
 from flask import session as cur_session
 from flask_login import login_required, current_user
 from .models import User, Game
+from sqlalchemy.orm import Session
+from sqlalchemy import create_engine
 from . import db
 from werkzeug.security import generate_password_hash
 
@@ -51,6 +53,10 @@ def disp_created_games(id, game_num):
 def get_created_games(id):
     print("hit!!")
     print("id is this: " + id)
+    url = db.engine.url
+    engine = create_engine(url)
+    session = Session(bind=engine)
+    session.connection(execution_options={"isolation_level": "READ UNCOMMITTED"})  
     user = User.query.filter_by(id=id).first()
     print("user" + user.username)     
     created_games = Game.query.filter_by(admin=user.username)
@@ -58,6 +64,7 @@ def get_created_games(id):
     result = []
     for game in created_games:
       result.append(game.id)
+    session.commit()
     return result
 
 @games.route('/disp_all_games/<game_num>')
@@ -101,30 +108,40 @@ def get_joined_games(id):
 
 @games.route('/join_game/<id>')
 def join_game(id):
-    game = Game.query.filter_by(id=id).first()
-    if current_user.is_playing(game):
-        flash("You're already playing this game!")
-        return redirect(url_for('main.profile'))
-    game.num_active_players += 1
-    current_user.join(game)
-    db.session.commit()
-    if 'url' in cur_session:
-      return redirect(cur_session['url'])
-    else:
+  url = db.engine.url
+  engine = create_engine(url)
+  session = Session(bind=engine)
+  session.connection(execution_options={"isolation_level": "READ UNCOMMITTED"})  
+  game = Game.query.filter_by(id=id).first()
+  if current_user.is_playing(game):
+      flash("You're already playing this game!")
       return redirect(url_for('main.profile'))
+  game.num_active_players += 1
+  current_user.join(game)
+  session.commit()
+  db.session.commit()
+  if 'url' in cur_session:
+    return redirect(cur_session['url'])
+  else:
+    return redirect(url_for('main.profile'))
 
 @games.route('/unjoin_game/<id>')
-def unjoin_gift(id):
-    game = Game.query.filter_by(id=id).first()
-    if game is None:
-        return redirect(url_for('index', id=id))
-    game.num_active_players -= 1
-    current_user.unjoin(game)
-    db.session.commit()
-    if 'url' in cur_session:
-      return redirect(cur_session['url'])
-    else:
-      return redirect(url_for('main.profile')) 
+def unjoin_game(id):
+  url = db.engine.url
+  engine = create_engine(url)
+  session = Session(bind=engine)
+  session.connection(execution_options={"isolation_level": "READ UNCOMMITTED"})  
+  game = Game.query.filter_by(id=id).first()
+  if game is None:
+      return redirect(url_for('index', id=id))
+  game.num_active_players -= 1
+  current_user.unjoin(game)
+  session.commit()
+  db.session.commit()
+  if 'url' in cur_session:
+    return redirect(cur_session['url'])
+  else:
+    return redirect(url_for('main.profile')) 
 
 def game_to_html(game_id):
  
@@ -148,7 +165,7 @@ def game_to_html(game_id):
         </div>"
 
     html_string_unjoined = "<form action=\"/join_game/"+str(game_id)+"\">\
-                  <button class=\"button is-block is-black is-medium is-fullwidth\">Join Game</button>\
+                  <button class=\"button is-block is-black is-medium is-fullwidth\" button style=\"margin:5px\">Join Game</button>\
                 </form>"
 
     html_string_joined = " <form action=\"/unjoin_game/"+str(game_id)+"\">\
@@ -168,6 +185,128 @@ def game_to_html(game_id):
         html_string_base += html_string_unjoined 
   
 
+    # Finish off whatever button state the post had
+    html_string_base += "</nav>"
+
+    # Finish off the whole html
+    html_string_base += "</div>"
+
+    return html_string_base
+
+@games.route('/view_game/<game_num>')
+def view_game(game_num): 
+  url = db.engine.url
+  engine = create_engine(url)
+  session = Session(bind=engine)
+  session.connection(execution_options={"isolation_level": "READ UNCOMMITTED"})  
+  game_num = int(game_num)
+  game_list = get_all_games()
+  list_len = len(game_list)
+  if (game_num > 0):
+    game_num -= 1
+
+  game = Game.query.filter_by(id=game_list[game_num]).first()
+
+  is_admin = False
+  if (game.admin == current_user.username):
+    is_admin = True
+
+  view_game_html = view_game_to_html(game_list[game_num])
+  session.commit()
+  return render_template('view_game.html', name=current_user.username, game_num=game_num, view_game_html=view_game_html, list_len=list_len, is_admin=is_admin)
+
+def get_secret_santa(game_id):
+  game = Game.query.filter_by(id=game_id).first()
+  all_users = User.query.all()
+  players = []
+  index = 0
+  curr_user_index = 0
+
+  for user in all_users:
+    if (User.is_playing(user, game)):
+      players.append(user)
+      if user.username == current_user.username:
+        curr_user_index = index
+    
+    index += 1
+  
+  if curr_user_index > len(players) - 1:
+    secret_santa = players[0]
+  else:
+    secret_santa = players[curr_user_index + 1]
+
+  return secret_santa
+
+def view_game_to_html(game_id):   
+    cur_session['url'] = request.url
+    game = Game.query.filter_by(id=game_id).first()
+    admin = User.query.filter_by(username=game.admin).first()
+    all_users = User.query.all()
+    players = []
+
+    for user in all_users:
+      if (User.is_playing(user, game)):
+        players.append(user)
+
+    capacity_str = ""
+    if game.num_active_players == game.max_capacity:
+      secret_santa = get_secret_santa(game_id)
+      capacity_str = "<br>Game has started. You're the Secret Santa for <strong>" + secret_santa.username + "</strong>! <br> *Click the button below to view their wish list <br>"
+      #TODO FIX METHOD TO REDIRECT TO
+      html_string_shuffle = "<form action=\"/disp_all_gifts/1\">\
+            <button class=\"button is-block is-black is-medium is-fullwidth\" button style=\"margin:10px\">View " + secret_santa.username + "'s Gift List</button>\
+          </form>"
+    else:
+      capacity_str = "<br> *Game will automatically start once capacity is met<br>"
+
+    html_string_base = "<div class=\"box\"> \
+        <article class=\"media\">\
+          <div class=\"media-content\">\
+            <div class=\"content\">\
+              <p>\
+                <strong>" + str(game.title) + "</strong>\
+                <br>" + "Created by: @" + str(admin.username) + "<br>\
+                <br> Capacity: " + str(game.num_active_players) + "/" + str(game.max_capacity) + capacity_str + "\
+                <br> Gifts range from $" + str(game.min_price) + " to $" + str(game.max_price)
+    
+    html_string_end_base = "</p>\
+      </div>\
+        </article>\
+        </div>\
+          <div class=\"level-right\">"
+    
+    #adding player list
+    count = 1
+    html_string_base += "<br>\
+      <br>"
+    for player in players:
+      html_string_base += "Player " + str(count) + ": " + player.username + "<br>"
+      count += 1
+
+    html_string_base += html_string_end_base
+
+    html_string_unjoined = "\
+      <form action=\"/join_game/"+str(game_id)+"\">\
+                  <button class=\"button is-block is-black is-medium is-fullwidth\">Join Game</button>\
+                </form>"
+
+    html_string_joined = "\
+       <form action=\"/unjoin_game/"+str(game_id)+"\">\
+                <button class=\"button is-block is-black is-medium is-fullwidth\" button style=\"margin:5px\">Leave Game</button>\
+              </form>"
+  
+
+    if current_user.is_playing(game) and game.admin != current_user.username:
+      html_string_base += html_string_joined
+    else:
+      if (game.num_active_players < game.max_capacity) and game.admin != current_user.username:
+        html_string_base += html_string_unjoined 
+  
+    if game.num_active_players == game.max_capacity:
+      html_string_base += html_string_shuffle
+    elif game.admin == current_user.username and game.num_active_players < game.max_capacity:
+      html_string_base += "Not enough players to start game"
+    
     # Finish off whatever button state the post had
     html_string_base += "</nav>"
 
