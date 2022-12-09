@@ -68,7 +68,7 @@ def signup_post():
     # for u in usernames:
     #     print(u)
     #     print(username)
-    if (len(usernames) > 0):
+    if (usernames is not None and len(usernames) > 0):
         # print(u)
         flash('Sorry, that username already exists!')
         return redirect(url_for('auth.signup'))
