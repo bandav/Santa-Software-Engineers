@@ -13,7 +13,7 @@ def edit_profile():
 
 @edit.route('/update_profile', methods=['POST'])
 def update_profile():
-  if request.form.get('action') == "Confirm 2":
+  if request.form.get('action') == "Confirm":
     displayname = request.form.get('displayname')
     oldpassword = request.form.get('oldpassword')
     newpassword = request.form.get('newpassword')

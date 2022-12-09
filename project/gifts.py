@@ -74,6 +74,20 @@ def unlike_gift(id):
   else:
     return redirect(url_for('main.profile', id=id))
 
+@gifts.route('/range')
+def range():
+  return render_template('range.html')
+
+@gifts.route('/search_range', methods=['POST'])
+def search_range():
+  if request.form.get('action') == "Search":
+    lower_range = request.form.get('lower_range')
+    upper_range = request.form.get('upper_range')
+    
+  return "yay"
+
+
+
 def gift_to_html(gift_id):
  
     cur_session['url'] = request.url
