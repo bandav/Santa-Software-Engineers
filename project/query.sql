@@ -15,3 +15,4 @@ DELETE FROM liked_gift where liking_id=1;
 
 INSERT INTO gift VALUES(0, "YSL Tote", 1000, "Pretty", "", 0);
 INSERT INTO gift VALUES(1, "Teddy Bear", 10, "So cute", "", 0);
+INSERT INTO gift VALUES(2, "iPhone", 900, "Call your mom!!!", "", 0);
