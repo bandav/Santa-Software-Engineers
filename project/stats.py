@@ -7,7 +7,7 @@ from sqlalchemy import create_engine
 from . import db
 from werkzeug.security import generate_password_hash
 
-stats = Blueprint('stats', _name_)
+stats = Blueprint('stats', __name__)
 
 @stats.route('/stats')
 def show_stats():
