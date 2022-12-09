@@ -29,6 +29,11 @@
       <button class="button is-block is-black is-large is-fullwidth" onclick="location.href='/disp_all_gifts/{{ gift_num - 1 }}';" type="button"value="Previous Gift" name="action" button
         style="margin:5px;">Previous Gift</button>
     {% endif %}
+
+    <form action="/disp_liked_gifts/{{ id }}/0">
+      <button class="button is-block is-black is-large is-fullwidth" value="Liked Gifts" name="action" button
+        style="margin:5px;">My Liked Gifts</button>
+    </form>
   </div>
 </div>
 
