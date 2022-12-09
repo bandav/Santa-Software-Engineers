@@ -230,7 +230,7 @@ def get_secret_santa(game_id):
     
     index += 1
   
-  if curr_user_index > len(players) - 1:
+  if curr_user_index >= len(players) - 1:
     secret_santa = players[0]
   else:
     secret_santa = players[curr_user_index + 1]
