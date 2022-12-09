@@ -149,8 +149,16 @@ def unjoin_game(id):
 
 def game_to_html(game_id):
     cur_session['url'] = request.url
+    url = db.engine.url
+    engine = create_engine(url)
+
     obj = Game.query.filter_by(id=game_id).first()
-    admin = User.query.filter_by(username=obj.admin).first()
+
+    #prepared statement
+    admin_sql = text("SELECT admin FROM game WHERE id = :id").bindparams(bindparam("id", String))
+    results = engine.execute(admin_sql, id=game_id)
+    admin = results.first()[0]
+
     print(admin)
     count = 0
 
@@ -160,7 +168,7 @@ def game_to_html(game_id):
             <div class=\"content\">\
               <p>\
                 <strong>" + str(obj.title) + "</strong>\
-                <br>" + "Created by: @" + str(admin.username) + "</p>\
+                <br>" + "Created by: @" + str(admin) + "</p>\
                 <br>" + "Capacity: " + str(obj.num_active_players) + "/" + str(obj.max_capacity) + "</p>\
                 <br>" + "Gifts range from $" + str(obj.min_price) + " to $" + str(obj.max_price) + "</p>\
             </div>\
