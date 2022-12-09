@@ -4,7 +4,11 @@ from flask import Blueprint, render_template, redirect, url_for, request, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, logout_user, login_required
 from .models import User
+from sqlalchemy import create_engine
 from . import db
+from sqlalchemy.sql import text
+from sqlalchemy.sql.expression import bindparam
+from sqlalchemy.types import String
 
 auth = Blueprint('auth', __name__)
 
@@ -36,16 +40,30 @@ def signup():
 
 @auth.route('/signup', methods=['POST'])
 def signup_post():
+    url = db.engine.url
+    engine = create_engine(url)
 
     username = request.form.get('username')
     displayname = request.form.get('displayname')
     password = request.form.get('password')
 
-    user = User.query.filter_by(username=username).first() # if this returns a user, then the email already exists in database
+    #prepared statement
+    sql = text("SELECT username FROM User WHERE username = :uname").bindparams(bindparam("uname", String))
+    results = engine.execute(sql, uname=username)
+    usernames = results.first()
 
-    if user: # if a user is found, we want to redirect back to signup page so user can try again  
+    # for u in usernames:
+    #     print(u)
+    #     print(username)
+    if (len(usernames) > 0):
+        # print(u)
         flash('Sorry, that username already exists!')
         return redirect(url_for('auth.signup'))
+    # user = User.query.filter_by(username=username).first() # if this returns a user, then the email already exists in database
+
+    # if user: # if a user is found, we want to redirect back to signup page so user can try again  
+    #     flash('Sorry, that username already exists!')
+    #     return redirect(url_for('auth.signup'))
 
     # create new user with the form data. Hash the password so plaintext version isn't saved.
     new_user = User(username=username, displayname=displayname, password=generate_password_hash(password, method='sha256'))
