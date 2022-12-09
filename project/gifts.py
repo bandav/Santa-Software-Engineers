@@ -78,15 +78,58 @@ def unlike_gift(id):
 def range():
   return render_template('range.html')
 
-@gifts.route('/search_range', methods=['POST'])
-def search_range():
+
+@gifts.route('/search_range/<gift_num>', methods=['POST'])
+def search_range(gift_num):
   if request.form.get('action') == "Search":
     lower_range = request.form.get('lower_range')
-    upper_range = request.form.get('upper_range')
-    
-  return "yay"
+    upper_range = request.form.get('upper_range') 
+    print(lower_range)
+    print(upper_range)
+    gift_list = get_range_gifts(lower_range=lower_range, upper_range=upper_range)
+    if (not gift_list or len(gift_list) == 0):
+      return "There are no gifts in this range"
+    gift_num = int(gift_num)
+    list_len = len(gift_list)
+    while (gift_num >= list_len):
+      gift_num -= 1
+    gift_html = gift_to_html(gift_list[gift_num])
+    return render_template('likes.html', id=id, gift_num = gift_num, gift_html = gift_html, list_len=list_len)
 
 
+# @gifts.route('/search_range/<gift_num>', methods=['POST'])
+# def search_range(gift_num):
+#   if request.form.get('action') == "Search":
+#     url = db.engine.url
+#     engine = create_engine(url)
+#     session = Session(bind=engine)
+#     session.connection(execution_options={"isolation_level": "READ UNCOMMITTED"})  
+#     lower_range = request.form.get('lower_range')
+#     upper_range = request.form.get('upper_range') 
+#     print(lower_range)
+#     print(upper_range)
+#     gift_num=0
+#     gift_list = get_range_gifts(lower_range=lower_range, upper_range=upper_range)
+#     if (len(gift_list) == 0):
+#         return redirect(url_for('main.profile'))
+#     gift_num = int(gift_num)
+#     list_len = len(gift_list)
+#     while (gift_num >= list_len):
+#         gift_num-=1
+#     gift_html = gift_to_html(gift_list[gift_num])
+#     return render_template('explore_range.html', gift_num=gift_num, gift_html=gift_html, list_len=list_len, id = current_user.id, lower_range=lower_range, upper_range=upper_range)
+
+def get_range_gifts(lower_range, upper_range): 
+    url = db.engine.url
+    engine = create_engine(url)
+    session = Session(bind=engine)
+    session.connection(execution_options={"isolation_level": "READ UNCOMMITTED"})  
+    gifts_in_range = Gift.query.filter(Gift.price.between(lower_range, upper_range))
+    result = []
+    for gift in gifts_in_range:
+      result.append(gift.id)
+    session.commit()
+    return result
 
 def gift_to_html(gift_id):
  
