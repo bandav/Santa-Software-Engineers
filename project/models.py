@@ -38,7 +38,7 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True) # primary keys are required by SQLAlchemy
     username = db.Column(db.String(250), unique=True)
     password = db.Column(db.String(250))
-    displayname = db.Column(db.String(250, index=True))
+    displayname = db.Column(db.String(250), index=True)
 
     liked = db.relationship('Gift', secondary=liked_gift,backref=db.backref('liked_gift', lazy='dynamic'), lazy='dynamic')
     
