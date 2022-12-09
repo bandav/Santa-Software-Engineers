@@ -6,6 +6,10 @@ from sqlalchemy.orm import Session
 from sqlalchemy import create_engine
 from . import db
 from werkzeug.security import generate_password_hash
+import sqlalchemy
+from sqlalchemy.sql import text
+from sqlalchemy.sql.expression import bindparam
+from sqlalchemy.types import String
 
 games = Blueprint('games', __name__)
 
@@ -144,10 +148,17 @@ def unjoin_game(id):
     return redirect(url_for('main.profile')) 
 
 def game_to_html(game_id):
- 
     cur_session['url'] = request.url
+    url = db.engine.url
+    engine = create_engine(url)
+
     obj = Game.query.filter_by(id=game_id).first()
-    admin = User.query.filter_by(username=obj.admin).first()
+
+    #prepared statement
+    admin_sql = text("SELECT admin FROM game WHERE id = :id").bindparams(bindparam("id", String))
+    results = engine.execute(admin_sql, id=game_id)
+    admin = results.first()[0]
+
     print(admin)
     count = 0
 
@@ -157,7 +168,7 @@ def game_to_html(game_id):
             <div class=\"content\">\
               <p>\
                 <strong>" + str(obj.title) + "</strong>\
-                <br>" + "Created by: @" + str(admin.username) + "</p>\
+                <br>" + "Created by: @" + str(admin) + "</p>\
                 <br>" + "Capacity: " + str(obj.num_active_players) + "/" + str(obj.max_capacity) + "</p>\
                 <br>" + "Gifts range from $" + str(obj.min_price) + " to $" + str(obj.max_price) + "</p>\
             </div>\
@@ -230,7 +241,7 @@ def get_secret_santa(game_id):
     
     index += 1
   
-  if curr_user_index > len(players) - 1:
+  if curr_user_index >= len(players) - 1:
     secret_santa = players[0]
   else:
     secret_santa = players[curr_user_index + 1]
@@ -239,8 +250,16 @@ def get_secret_santa(game_id):
 
 def view_game_to_html(game_id):   
     cur_session['url'] = request.url
+    url = db.engine.url
+    engine = create_engine(url)
+
     game = Game.query.filter_by(id=game_id).first()
-    admin = User.query.filter_by(username=game.admin).first()
+    #admin = User.query.filter_by(username=game.admin).first()
+
+    admin_sql = text("SELECT admin FROM game WHERE id = :id").bindparams(bindparam("id", String))
+    results = engine.execute(admin_sql, id=game_id)
+    admin = results.first()[0]
+
     all_users = User.query.all()
     players = []
 
@@ -249,15 +268,18 @@ def view_game_to_html(game_id):
         players.append(user)
 
     capacity_str = ""
-    if game.num_active_players == game.max_capacity:
+    if (User.is_playing(current_user, game)) and game.num_active_players == game.max_capacity:
       secret_santa = get_secret_santa(game_id)
       capacity_str = "<br>Game has started. You're the Secret Santa for <strong>" + secret_santa.username + "</strong>! <br> *Click the button below to view their wish list <br>"
       #TODO FIX METHOD TO REDIRECT TO
       html_string_shuffle = "<form action=\"/disp_all_gifts/1\">\
             <button class=\"button is-block is-black is-medium is-fullwidth\" button style=\"margin:10px\">View " + secret_santa.username + "'s Gift List</button>\
           </form>"
-    else:
+    elif (User.is_playing(current_user, game)) and game.num_active_players < game.max_capacity:
       capacity_str = "<br> *Game will automatically start once capacity is met<br>"
+    elif (not User.is_playing(current_user, game)) and game.num_active_players == game.max_capacity:
+      capacity_str = "<br>"
+      html_string_shuffle = "<br> Game is full"
 
     html_string_base = "<div class=\"box\"> \
         <article class=\"media\">\
@@ -265,7 +287,7 @@ def view_game_to_html(game_id):
             <div class=\"content\">\
               <p>\
                 <strong>" + str(game.title) + "</strong>\
-                <br>" + "Created by: @" + str(admin.username) + "<br>\
+                <br>" + "Created by: @" + str(admin) + "<br>\
                 <br> Capacity: " + str(game.num_active_players) + "/" + str(game.max_capacity) + capacity_str + "\
                 <br> Gifts range from $" + str(game.min_price) + " to $" + str(game.max_price)
     

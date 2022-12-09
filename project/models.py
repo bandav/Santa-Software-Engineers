@@ -35,8 +35,8 @@ liked_gift = db.Table('liked_gift',
 ###encrypted_password varchar(250)
 ###);
 class User(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True) # primary keys are required by SQLAlchemy
-    username = db.Column(db.String(250), unique=True)
+    id = db.Column(db.Integer, primary_key=True, index=True) # primary keys are required by SQLAlchemy
+    username = db.Column(db.String(250), unique=True, index=True)
     password = db.Column(db.String(250))
     displayname = db.Column(db.String(250))
 
@@ -76,7 +76,7 @@ class User(UserMixin, db.Model):
 ###purchase_link varchar(250)
 ###);
 class Gift(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True) # primary keys are required by SQLAlchemy
+    id = db.Column(db.Integer, primary_key=True, index=True) # primary keys are required by SQLAlchemy
     gift_name = db.Column(db.String(250), unique=True)
     price = db.Column(db.Integer, index=True)
     description = db.Column(db.String(250))
@@ -92,7 +92,7 @@ class Gift(UserMixin, db.Model):
 ###min_price integer,
 ###);
 class Game(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True) # primary keys are required by SQLAlchemy
+    id = db.Column(db.Integer, primary_key=True, index=True) # primary keys are required by SQLAlchemy
     title=db.Column(db.String(250))
     admin = db.Column(db.String(250))
     num_active_players = db.Column(db.Integer)
