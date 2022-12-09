@@ -6,11 +6,16 @@ from sqlalchemy.orm import Session
 from sqlalchemy import create_engine
 from . import db
 from werkzeug.security import generate_password_hash
+from sqlalchemy.sql import text
+from sqlalchemy.sql.expression import bindparam
+from sqlalchemy.types import String
 
 stats = Blueprint('stats', __name__)
 
 @stats.route('/stats')
 def show_stats():
+    url = db.engine.url
+    engine = create_engine(url)
     num_created = 0
     num_joined = 0
 
@@ -18,7 +23,13 @@ def show_stats():
     for game in all_games:
         if current_user.is_playing(game):
             num_joined += 1
-        if (game.admin == current_user.username):
+        
+        #prepared statement
+        admin_sql = text("SELECT admin FROM game WHERE id = :id").bindparams(bindparam("id", String))
+        results = engine.execute(admin_sql, id=game.id)
+        admin = results.first()[0]
+
+        if (admin == current_user.username):
             num_created += 1
 
     num_liked = 0
@@ -29,11 +40,22 @@ def show_stats():
     for gift in all_gifts:
         if current_user.is_liking(gift):
             num_liked += 1
-            price = gift.price
+            # price = gift.price
+
+            #prepared statement
+            price_sql = text("SELECT price FROM gift WHERE id = :id").bindparams(bindparam("id", String))
+            results = engine.execute(price_sql, id=gift.id)
+            price = results.first()[0]
+
             if (price > max_liked_price):
                 max_liked_price = price
             if (price < min_liked_price):
                 min_liked_price = price
+    
+    # no liked gifts
+    if (max_liked_price == -1 and min_liked_price == 1238492291):
+        max_liked_price = 0
+        min_liked_price = 0
 
     stats_html = "<div class=\"box\"> \
         <article class=\"media\">\
