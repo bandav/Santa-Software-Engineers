@@ -6,20 +6,9 @@
 
 <div class="columns is-2 is-offset-2">
   <div class="column">
-    <h1 class="title">Statistics</h1>
+    <h1 class="title">{{name}}'s Statistics</h1>
     <div class="box">
-          {{ view_game_html|safe }}
+          {{ stats_html|safe }}
     </div>
-
-  <h1 class="title">Actions</h1>
-  <div class="box">
-    {% if game_num < list_len - 1 %}
-      <button class="button is-block is-black is-large is-fullwidth" onclick="location.href='/view_game/{{ game_num + 2 }}';" type="button"value="View Next Game" name="action" button style="margin:5px;">View Next Game</button>
-    {% endif %}
-
-    {% if game_num > 0 %}
-      <button class="button is-block is-black is-large is-fullwidth" onclick="location.href='/view_game/{{ game_num}}';" type="button"value="View Previous Game" name="action" button
-        style="margin:5px;">View Previous Game</button>
-    {% endif %}
   </div>
 {% endblock %}
