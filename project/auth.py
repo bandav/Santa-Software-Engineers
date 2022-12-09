@@ -18,18 +18,31 @@ def login():
 
 @auth.route('/login', methods=['POST'])
 def login_post():
+    url = db.engine.url
+    engine = create_engine(url)
+
     username = request.form.get('username')
     password = request.form.get('password')
     remember = True if request.form.get('remember') else False
 
-    user = User.query.filter_by(username=username).first()
 
+    user = User.query.filter_by(username=username).first()
+   
+    #prepared statement - for password
+    sql = text("SELECT password FROM User WHERE username = :uname").bindparams(bindparam("uname", String))
+    results = engine.execute(sql, uname=username)
+    actual_password = results.first()[0]
+   
     # check if user actually exists
-    # take the user supplied password, hash it, and compare it to the hashed password in database
-    if not user or not check_password_hash(user.password, password): 
+    if not user: #or not check_password_hash(user.password, password): 
         flash('Please check your login details and try again.')
         return redirect(url_for('auth.login')) # if user doesn't exist or password is wrong, reload the page
-
+    
+    # take the user supplied password, hash it, and compare it to the hashed password in database
+    if not check_password_hash(actual_password, password):
+        flash('Please check your login details and try again.')
+        return redirect(url_for('auth.login')) # if user doesn't exist or password is wrong, reload the page
+ 
     # if the above check passes, then we know the user has the right credentials
     login_user(user, remember=remember)
     return redirect(url_for('main.profile'))
