@@ -131,6 +131,7 @@ def game_to_html(game_id):
     cur_session['url'] = request.url
     obj = Game.query.filter_by(id=game_id).first()
     admin = User.query.filter_by(username=obj.admin).first()
+    print(admin)
     count = 0
 
     html_string_base = "<div class=\"box\"> \

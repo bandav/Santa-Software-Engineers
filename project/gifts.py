@@ -17,7 +17,7 @@ def disp_all_gifts(gift_num):
     while (gift_num >= list_len):
         gift_num-=1
     gift_html = gift_to_html(gift_list[gift_num])
-    return render_template('explore_gifts.html', gift_num=gift_num, gift_html=gift_html, list_len=list_len)
+    return render_template('explore_gifts.html', gift_num=gift_num, gift_html=gift_html, list_len=list_len, id = current_user.id)
 
 def get_all_gifts():   
     all_gifts = Gift.query.all()
