@@ -4,7 +4,7 @@
 
 <div class="columns is-2 is-offset-2">
   <div class="column">
-    <h1 class="title">Liked Gifts</h1>
+    <h1 class="title">Gifts In Range</h1>
     <div class="box">
 
         {% for message in get_flashed_messages() %}
@@ -20,15 +20,22 @@
 
   <h1 class="title">Actions</h1>
   <div class="box">
-
     {% if gift_num < list_len - 1 %}
-      <button class="button is-block is-black is-large is-fullwidth" onclick="location.href='/disp_liked_gifts/{{ id }}/{{ gift_num + 1 }}';" type="button"value="Next Gift" name="action" button
-        style="margin:5px;">Next Gift</button>
+    <form action="/search_range/{{ gift_num + 1 }}" method="POST">
+      <input type = "hidden" name = "upper_range" value = {{upper_range}} />
+      <input type = "hidden" name = "lower_range" value = {{lower_range}} />
+
+      <button class="button is-block is-black is-large is-fullwidth" value="Next Gift" name="next" button style="margin:5px;">Next Gift</button>
+    </form>  
     {% endif %}
 
     {% if gift_num > 0 %}
-      <button class="button is-block is-black is-large is-fullwidth" onclick="location.href='/disp_liked_gifts/{{ id }}/{{ gift_num - 1 }}';" type="button"value="Previous Gift" name="action" button
-        style="margin:5px;">Previous Gift</button>
+    <form action="/search_range/{{ gift_num - 1 }}" method="POST">
+      <input type = "hidden" name = "upper_range" value = {{upper_range}} />
+      <input type = "hidden" name = "lower_range" value = {{lower_range}} />
+
+      <button class="button is-block is-black is-large is-fullwidth" value="Previous Gift" name="prev" button style="margin:5px;">Previous Gift</button>
+    </form> 
     {% endif %}
   </div>
 </div>

@@ -270,15 +270,14 @@ def view_game_to_html(game_id):
     capacity_str = ""
     if (User.is_playing(current_user, game)) and game.num_active_players == game.max_capacity:
       secret_santa = get_secret_santa(game_id)
-      capacity_str = "<br>Game has started. You're the Secret Santa for <strong>" + secret_santa.username + "</strong>! <br> *Click the button below to view their wish list <br>"
+      capacity_str = "<br>Game has started. You're the Secret Santa for <strong>" + secret_santa.username + "</strong>! <br> *Click the button below to view their wish list"
       #TODO FIX METHOD TO REDIRECT TO
       html_string_shuffle = "<form action=\"/disp_all_gifts/1\">\
             <button class=\"button is-block is-black is-medium is-fullwidth\" button style=\"margin:10px\">View " + secret_santa.username + "'s Gift List</button>\
           </form>"
     elif (User.is_playing(current_user, game)) and game.num_active_players < game.max_capacity:
-      capacity_str = "<br> *Game will automatically start once capacity is met<br>"
+      capacity_str = "<br> *Game will automatically start once capacity is met"
     elif (not User.is_playing(current_user, game)) and game.num_active_players == game.max_capacity:
-      capacity_str = "<br>"
       html_string_shuffle = "<br> Game is full"
 
     html_string_base = "<div class=\"box\"> \
@@ -289,7 +288,7 @@ def view_game_to_html(game_id):
                 <strong>" + str(game.title) + "</strong>\
                 <br>" + "Created by: @" + str(admin) + "<br>\
                 <br> Capacity: " + str(game.num_active_players) + "/" + str(game.max_capacity) + capacity_str + "\
-                <br> Gifts range from $" + str(game.min_price) + " to $" + str(game.max_price)
+                <br><br> Gifts range from $" + str(game.min_price) + " to $" + str(game.max_price)
     
     html_string_end_base = "</p>\
       </div>\
