@@ -60,7 +60,7 @@ def get_created_games(id):
     url = db.engine.url
     engine = create_engine(url)
     session = Session(bind=engine)
-    session.connection(execution_options={"isolation_level": "READ UNCOMMITTED"})  
+    session.connection(execution_options={"isolation_level": "SERIALIZABLE"})  
     user = User.query.filter_by(id=id).first()
     print("user" + user.username)     
     created_games = Game.query.filter_by(admin=user.username)
@@ -115,7 +115,7 @@ def join_game(id):
   url = db.engine.url
   engine = create_engine(url)
   session = Session(bind=engine)
-  session.connection(execution_options={"isolation_level": "READ UNCOMMITTED"})  
+  session.connection(execution_options={"isolation_level": "SERIALIZABLE"})  
   game = Game.query.filter_by(id=id).first()
   if current_user.is_playing(game):
       flash("You're already playing this game!")
@@ -134,7 +134,7 @@ def unjoin_game(id):
   url = db.engine.url
   engine = create_engine(url)
   session = Session(bind=engine)
-  session.connection(execution_options={"isolation_level": "READ UNCOMMITTED"})  
+  session.connection(execution_options={"isolation_level": "SERIALIZABLE"})  
   game = Game.query.filter_by(id=id).first()
   if game is None:
       return redirect(url_for('index', id=id))
@@ -209,7 +209,7 @@ def view_game(game_num):
   url = db.engine.url
   engine = create_engine(url)
   session = Session(bind=engine)
-  session.connection(execution_options={"isolation_level": "READ UNCOMMITTED"})  
+  session.connection(execution_options={"isolation_level": "SERIALIZABLE"})  
   game_num = int(game_num)
   game_list = get_all_games()
   list_len = len(game_list)
