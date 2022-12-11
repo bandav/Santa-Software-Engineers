@@ -37,6 +37,47 @@ def get_all_gifts():
     session.commit()
     return result
 
+@gifts.route('/like_gift/<id>', methods=['POST'])
+def like_gift(id):
+  print("liked en gifts.py")
+  url = db.engine.url
+  engine = create_engine(url)
+  session = Session(bind=engine)
+  session.connection(execution_options={"isolation_level": "READ UNCOMMITTED"})  
+  gift = Gift.query.filter_by(id=id).first()
+  if current_user.is_liking(gift):
+      flash("You've already liked this gift!")
+      return redirect(url_for('main.profile'))
+  gift.likes += 1
+  current_user.like(gift)
+  session.commit()
+  db.session.commit()
+  if 'url' in cur_session:
+    print("just liked, about to return")
+    print(cur_session['url'])
+    return redirect(cur_session['url'])
+  else:
+    return redirect(url_for('main.profile', id=id))
+
+@gifts.route('/unlike_gift/<id>')
+def unlike_gift(id):
+  print("unliked en gifts.py")
+  url = db.engine.url
+  engine = create_engine(url)
+  session = Session(bind=engine)
+  session.connection(execution_options={"isolation_level": "READ UNCOMMITTED"})  
+  gift = Gift.query.filter_by(id=id).first()
+  if gift is None:
+      return redirect(url_for('index', id=id))
+  gift.likes -= 1
+  current_user.unlike(gift)
+  session.commit()
+  db.session.commit()
+  if 'url' in cur_session:
+    return redirect(cur_session['url'])
+  else:
+    return redirect(url_for('main.profile', id=id))
+
 @gifts.route('/range')
 def range():
   return render_template('range.html')
@@ -200,6 +241,4 @@ def gift_to_html(gift_id):
     html_string_base += "</div>"
 
     return html_string_base
-
-
 

@@ -32,6 +32,7 @@ def get_liked_gifts(id):
 
 @likes.route('/like_gift/<id>')
 def like_gift(id):
+  print("liked en likes.py")
   url = db.engine.url
   engine = create_engine(url)
   session = Session(bind=engine)
@@ -51,6 +52,7 @@ def like_gift(id):
 
 @likes.route('/unlike_gift/<id>')
 def unlike_gift(id):
+  print("unliked en likes.py")
   url = db.engine.url
   engine = create_engine(url)
   session = Session(bind=engine)
