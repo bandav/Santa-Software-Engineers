@@ -11,6 +11,7 @@ SELECT * FROM liked_gift WHERE liking_id = 1;
 
 DELETE FROM gift WHERE id=0;
 DELETE FROM gift WHERE id=1;
+select * from game;
 
 DELETE FROM liked_gift;
 

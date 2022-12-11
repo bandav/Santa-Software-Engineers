@@ -144,8 +144,8 @@ def get_secret_gifts(person_to_gift, lower_range, upper_range):
     print(lower_range)
     print("upper is below:")
     print(upper_range)
-    all_gifts = Gift.query.filter(Gift.price.between(upper_range, lower_range))
-    # print(all_gifts[0].gift_name)
+    all_gifts = Gift.query.filter(Gift.price.between(lower_range, upper_range))
+    #print(all_gifts[0].gift_name)
     # print(all_gifts)
     result = []
     for gift in all_gifts:

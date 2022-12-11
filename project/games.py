@@ -170,7 +170,7 @@ def game_to_html(game_id):
                 <strong>" + str(obj.title) + "</strong>\
                 <br>" + "Created by: @" + str(admin) + "</p>\
                 <br>" + "Capacity: " + str(obj.num_active_players) + "/" + str(obj.max_capacity) + "</p>\
-                <br>" + "Gifts range from $" + str(obj.max_price) + " to $" + str(obj.min_price) + "</p>\
+                <br>" + "Gifts range from $" + str(obj.min_price) + " to $" + str(obj.max_price) + "</p>\
             </div>\
         </article>\
         </div>"
