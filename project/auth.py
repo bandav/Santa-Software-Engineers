@@ -25,18 +25,17 @@ def login_post():
     password = request.form.get('password')
     remember = True if request.form.get('remember') else False
 
-
     user = User.query.filter_by(username=username).first()
+
+    # check if user actually exists
+    if not user: #or not check_password_hash(user.password, password): 
+        flash('Please check your login details and try again.')
+        return redirect(url_for('auth.login')) # if user doesn't exist or password is wrong, reload the page
    
     #prepared statement - for password
     sql = text("SELECT password FROM User WHERE username = :uname").bindparams(bindparam("uname", String))
     results = engine.execute(sql, uname=username)
     actual_password = results.first()[0]
-   
-    # check if user actually exists
-    if not user: #or not check_password_hash(user.password, password): 
-        flash('Please check your login details and try again.')
-        return redirect(url_for('auth.login')) # if user doesn't exist or password is wrong, reload the page
     
     # take the user supplied password, hash it, and compare it to the hashed password in database
     if not check_password_hash(actual_password, password):
