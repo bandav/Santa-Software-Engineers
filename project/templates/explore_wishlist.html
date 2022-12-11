@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="columns is-2 is-offset-2">
+  <div class="column">
+    <h1 class="title">Gifts Liked by {{ person_to_gift }}</h1>
+    <div class="box">
+
+        {% for message in get_flashed_messages() %}
+        <div class="alert alert-warning">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+                {{ message }}
+            </div>
+        {% endfor %}
+
+        {{ gift_html|safe }}
+
+    </div>
+
+  <h1 class="title">Actions</h1>
+  <div class="box">
+    {% if gift_num < list_len - 1 %}
+    <form action="/secret_wishlist/{{game_id}}/{{ id }}/{{ gift_num + 1 }}">
+      <input type = "hidden" name = "upper_range" value = {{upper_range}} />
+      <input type = "hidden" name = "lower_range" value = {{lower_range}} />
+
+      <button class="button is-block is-black is-large is-fullwidth" value="Next Gift" name="next" button style="margin:5px;">Next Gift</button>
+    </form>  
+    {% endif %}
+
+    {% if gift_num > 0 %}
+    <form action="/secret_wishlist/{{game_id}}/{{ id }}/{{ gift_num - 1 }}">
+      <input type = "hidden" name = "upper_range" value = {{upper_range}} />
+      <input type = "hidden" name = "lower_range" value = {{lower_range}} />
+
+      <button class="button is-block is-black is-large is-fullwidth" value="Previous Gift" name="prev" button style="margin:5px;">Previous Gift</button>
+    </form> 
+    {% endif %}
+    
+  </div>
+</div>
+
+{% endblock %}

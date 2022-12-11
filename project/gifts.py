@@ -3,7 +3,7 @@ from flask import session as cur_session
 from flask_login import login_required, current_user
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine
-from .models import User, Gift
+from .models import User, Gift, Game
 from . import db
 from werkzeug.security import generate_password_hash
 
@@ -78,7 +78,6 @@ def unlike_gift(id):
 def range():
   return render_template('range.html')
 
-
 @gifts.route('/search_range/<gift_num>', methods=['POST'])
 def search_range(gift_num):
   if request.form.get('action') == "Search" or request.form.get('next') == "Next Gift" or request.form.get('prev') == "Previous Gift":
@@ -101,29 +100,6 @@ def search_range(gift_num):
     gift_html = gift_to_html(gift_list[gift_num])
     return render_template('explore_range.html', id=id, gift_num = gift_num, gift_html = gift_html, list_len=list_len, lower_range=lower_range, upper_range=upper_range)
 
-
-# @gifts.route('/search_range/<gift_num>', methods=['POST'])
-# def search_range(gift_num):
-#   if request.form.get('action') == "Search":
-#     url = db.engine.url
-#     engine = create_engine(url)
-#     session = Session(bind=engine)
-#     session.connection(execution_options={"isolation_level": "READ UNCOMMITTED"})  
-#     lower_range = request.form.get('lower_range')
-#     upper_range = request.form.get('upper_range') 
-#     print(lower_range)
-#     print(upper_range)
-#     gift_num=0
-#     gift_list = get_range_gifts(lower_range=lower_range, upper_range=upper_range)
-#     if (len(gift_list) == 0):
-#         return redirect(url_for('main.profile'))
-#     gift_num = int(gift_num)
-#     list_len = len(gift_list)
-#     while (gift_num >= list_len):
-#         gift_num-=1
-#     gift_html = gift_to_html(gift_list[gift_num])
-#     return render_template('explore_range.html', gift_num=gift_num, gift_html=gift_html, list_len=list_len, id = current_user.id, lower_range=lower_range, upper_range=upper_range)
-
 def get_range_gifts(lower_range, upper_range): 
     url = db.engine.url
     engine = create_engine(url)
@@ -135,6 +111,35 @@ def get_range_gifts(lower_range, upper_range):
     for gift in gifts_in_range:
       result.append(gift.id)
     session.commit()
+    return result
+
+@gifts.route('/secret_wishlist/<game_id>/<secret_santa>/<gift_num>')
+def secret_wishlist(secret_santa, game_id, gift_num):
+  person_to_gift = User.query.filter_by(id=secret_santa).first()
+  game_id = int(game_id)
+  game_playing = Game.query.filter_by(id=game_id).first()
+  game_lower_bound = game_playing.min_price
+  game_upper_bound = game_playing.max_price
+  # print(game_lower_bound)
+  # print(game_upper_bound)
+  gift_list = get_secret_gifts(person_to_gift, game_lower_bound, game_upper_bound)
+  print(gift_list)
+  if (not gift_list or len(gift_list) == 0):
+    return (person_to_gift.username + " has not liked any gifts, tell them to like some!")
+  gift_num = int(gift_num)
+  list_len = len(gift_list)
+  while (gift_num >= list_len):
+    gift_num -= 1
+  gift_html = gift_to_html(gift_list[gift_num])
+
+  return render_template('explore_wishlist.html',id=person_to_gift.id, game_id=game_id, person_to_gift=person_to_gift.username, gift_num = gift_num, gift_html = gift_html, list_len=list_len)
+
+def get_secret_gifts(person_to_gift, lower_range, upper_range):
+    all_gifts = Gift.query.filter(Gift.price.between(lower_range, upper_range))
+    result = []
+    for gift in all_gifts:
+      if person_to_gift.is_liking(gift):
+        result.append(gift.id)
     return result
 
 def gift_to_html(gift_id):
