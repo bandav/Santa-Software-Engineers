@@ -37,7 +37,7 @@ def get_all_gifts():
     session.commit()
     return result
 
-@gifts.route('/like_gift/<id>', methods=['POST'])
+@gifts.route('/like_gift/<id>')
 def like_gift(id):
   print("liked en gifts.py")
   url = db.engine.url

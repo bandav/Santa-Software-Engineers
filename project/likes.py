@@ -30,44 +30,44 @@ def get_liked_gifts(id):
         result.append(gift.id)
     return result
 
-@likes.route('/like_gift/<id>')
-def like_gift(id):
-  print("liked en likes.py")
-  url = db.engine.url
-  engine = create_engine(url)
-  session = Session(bind=engine)
-  session.connection(execution_options={"isolation_level": "READ UNCOMMITTED"})  
-  gift = Gift.query.filter_by(id=id).first()
-  if current_user.is_liking(gift):
-      flash("You've already liked this gift!")
-      return redirect(url_for('main.profile'))
-  gift.likes += 1
-  current_user.like(gift)
-  session.commit()
-  db.session.commit()
-  if 'url' in cur_session:
-    return redirect(cur_session['url'])
-  else:
-    return redirect(url_for('main.profile', id=id))
+# @likes.route('/like_gift/<id>')
+# def like_gift(id):
+#   print("liked en likes.py")
+#   url = db.engine.url
+#   engine = create_engine(url)
+#   session = Session(bind=engine)
+#   session.connection(execution_options={"isolation_level": "READ UNCOMMITTED"})  
+#   gift = Gift.query.filter_by(id=id).first()
+#   if current_user.is_liking(gift):
+#       flash("You've already liked this gift!")
+#       return redirect(url_for('main.profile'))
+#   gift.likes += 1
+#   current_user.like(gift)
+#   session.commit()
+#   db.session.commit()
+#   if 'url' in cur_session:
+#     return redirect(cur_session['url'])
+#   else:
+#     return redirect(url_for('main.profile', id=id))
 
-@likes.route('/unlike_gift/<id>')
-def unlike_gift(id):
-  print("unliked en likes.py")
-  url = db.engine.url
-  engine = create_engine(url)
-  session = Session(bind=engine)
-  session.connection(execution_options={"isolation_level": "READ UNCOMMITTED"})  
-  gift = Gift.query.filter_by(id=id).first()
-  if gift is None:
-      return redirect(url_for('index', id=id))
-  gift.likes -= 1
-  current_user.unlike(gift)
-  session.commit()
-  db.session.commit()
-  if 'url' in cur_session:
-    return redirect(cur_session['url'])
-  else:
-    return redirect(url_for('main.profile', id=id))
+# @likes.route('/unlike_gift/<id>')
+# def unlike_gift(id):
+#   print("unliked en likes.py")
+#   url = db.engine.url
+#   engine = create_engine(url)
+#   session = Session(bind=engine)
+#   session.connection(execution_options={"isolation_level": "READ UNCOMMITTED"})  
+#   gift = Gift.query.filter_by(id=id).first()
+#   if gift is None:
+#       return redirect(url_for('index', id=id))
+#   gift.likes -= 1
+#   current_user.unlike(gift)
+#   session.commit()
+#   db.session.commit()
+#   if 'url' in cur_session:
+#     return redirect(cur_session['url'])
+#   else:
+#     return redirect(url_for('main.profile', id=id))
 
 
 def gift_to_html(gift_id):
