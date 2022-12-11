@@ -67,6 +67,7 @@ def unlike_gift(id):
   else:
     return redirect(url_for('main.profile', id=id))
 
+
 def gift_to_html(gift_id):
     cur_session['url'] = request.url
     obj = Gift.query.filter_by(id=gift_id).first()
@@ -83,8 +84,6 @@ def gift_to_html(gift_id):
                 <button class=\"button is-block is-link is-normal\" button style=\"margin:5px\"><a href=" + str(obj.purchase_link) + ">Link to Gift</a></button><div class=\"field is-grouped\" style=\"padding-top: 10px;\">"
     html_string_base += "</article>\
         </div>"
-
-    
 
     html_string_liked = "<div class=\"level-right\">\
               <form action=\"/unlike_gift/"+str(gift_id)+"\">\

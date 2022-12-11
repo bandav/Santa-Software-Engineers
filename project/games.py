@@ -170,7 +170,7 @@ def game_to_html(game_id):
                 <strong>" + str(obj.title) + "</strong>\
                 <br>" + "Created by: @" + str(admin) + "</p>\
                 <br>" + "Capacity: " + str(obj.num_active_players) + "/" + str(obj.max_capacity) + "</p>\
-                <br>" + "Gifts range from $" + str(obj.min_price) + " to $" + str(obj.max_price) + "</p>\
+                <br>" + "Gifts range from $" + str(obj.max_price) + " to $" + str(obj.min_price) + "</p>\
             </div>\
         </article>\
         </div>"
@@ -270,7 +270,7 @@ def view_game_to_html(game_id):
     capacity_str = ""
     if (User.is_playing(current_user, game)) and game.num_active_players == game.max_capacity:
       secret_santa = get_secret_santa(game_id)
-      # print("your secret santa is " + secret_santa.username)
+      print("your secret santa is " + secret_santa.username)
       # print(secret_santa.id)
       # print("listo")
       capacity_str = "<br>Game has started. You're the Secret Santa for <strong>" + secret_santa.username + "</strong>! <br> *Click the button below to view their wish list"
