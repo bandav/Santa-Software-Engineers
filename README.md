@@ -1,5 +1,6 @@
 # Santa-Software-Engineers
 ## 348 Group Project
+348 Project that is meant to focus on SQL integration for database management. Focus is not meant to be on UI/UX, but rather efficient data handling.
 Link to project drive: https://drive.google.com/drive/folders/1BzgpXEAnBL_EVPqr-ravAbfB80vOINdp
 ## Running this Project
 1. Create a fresh directory on your local system for Santa's Software Engineers.
